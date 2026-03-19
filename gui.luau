@@ -1,3 +1,7 @@
+-- ==========================================
+-- KEMPLONGXD HUB V7 - BAGIAN 1
+-- Copy semua kode di bawah ini terlebih dahulu
+-- ==========================================
 local Library = { Flags = {}, Connections = {}, ToggleKey = Enum.KeyCode.RightControl }
 local TS = game:GetService("TweenService")
 local UIS = game:GetService("UserInputService")
@@ -58,7 +62,6 @@ function Library:CreateWindow(Config)
     Library.UI = SG; NotifContainer.Parent = SG
 
     local function LoadMainUI()
-        -- Watermark
         local WMFrame = Make("Frame", {Parent = SG, BackgroundColor3 = Color3.fromRGB(30,30,30), Position = UDim2.new(0, 10, 0, 10), Size = UDim2.new(0, 250, 0, 25), ZIndex = 100})
         Make("UICorner", {Parent = WMFrame, CornerRadius = UDim.new(0, 6)}); Make("UIStroke", {Parent = WMFrame, Color = Color3.fromRGB(60,60,60), Thickness = 1})
         local WMLabel = Make("TextLabel", {Parent = WMFrame, BackgroundTransparency = 1, Size = UDim2.new(1, -10, 1, 0), Position = UDim2.new(0, 5, 0, 0), Font = Enum.Font.Gotham, Text = Name .. " | FPS: 0 | Ping: 0ms", TextColor3 = Color3.fromRGB(220,220,220), TextSize = 12, TextXAlignment = Enum.TextXAlignment.Left, ZIndex = 101})
@@ -136,7 +139,10 @@ function Library:CreateWindow(Config)
                 local function UpdateSize() PDesc.Size = UDim2.new(1, -20, 0, PDesc.TextBounds.Y); PF.Size = UDim2.new(1, -10, 0, PDesc.TextBounds.Y + 35) end
                 UpdateSize(); PDesc:GetPropertyChangedSignal("TextBounds"):Connect(UpdateSize)
             end
-
+-- ==========================================
+-- KEMPLONGXD HUB V7 - BAGIAN 2
+-- Paste kode ini persis di bawah baris terakhir Bagian 1
+-- ==========================================
             function Elements:CreateButton(BName, Call)
                 local Btn = Make("TextButton", {Parent = TContent, BackgroundColor3 = Color3.fromRGB(45,45,45), Size = UDim2.new(1,-10,0,35), Font = Enum.Font.Gotham, Text = "  " .. BName, TextColor3 = Color3.fromRGB(220,220,220), TextSize = 13, TextXAlignment = Enum.TextXAlignment.Left, ZIndex = 4})
                 Make("UICorner", {Parent = Btn, CornerRadius = UDim.new(0, 6)})
@@ -195,4 +201,101 @@ function Library:CreateWindow(Config)
 
                 local DropObj = {}
                 function DropObj:Refresh(NewOpts)
-                    for _, child in ipairs(DScroll:GetChildren()) do if child:IsA("TextButton") th
+                    for _, child in ipairs(DScroll:GetChildren()) do if child:IsA("TextButton") then child:Destroy() end end
+                    for _, o in ipairs(NewOpts) do
+                        local OBtn = Make("TextButton", {Parent = DScroll, BackgroundColor3 = Color3.fromRGB(55,55,55), Size = UDim2.new(1,0,0,25), Font = Enum.Font.Gotham, Text = "  " .. tostring(o), TextColor3 = Color3.fromRGB(200,200,200), TextSize = 12, TextXAlignment = Enum.TextXAlignment.Left, BorderSizePixel = 0, ZIndex = 6})
+                        OBtn.MouseButton1Click:Connect(function() Library.Flags[Flag] = o; DBtn.Text = "  " .. DName .. " : " .. tostring(o); open = false; TS:Create(DF, TweenInfo.new(0.2), {Size = UDim2.new(1,-10,0,35)}):Play(); pcall(Call, o) end)
+                    end
+                    if open then TS:Create(DF, TweenInfo.new(0.2), {Size = UDim2.new(1,-10,0,35 + math.clamp(#NewOpts, 0, 4)*25)}):Play() end
+                end
+                DropObj:Refresh(Opts); return DropObj
+            end
+
+            function Elements:CreateInput(Flag, IName, PlaceHolder, Call)
+                Library.Flags[Flag] = Library.Flags[Flag] or ""
+                local IF = Make("Frame", {Parent = TContent, BackgroundColor3 = Color3.fromRGB(45,45,45), Size = UDim2.new(1,-10,0,35), ZIndex = 4})
+                Make("UICorner", {Parent = IF, CornerRadius = UDim.new(0, 6)})
+                Make("TextLabel", {Parent = IF, BackgroundTransparency = 1, Size = UDim2.new(0.5,0,1,0), Position = UDim2.new(0,10,0,0), Font = Enum.Font.Gotham, Text = IName, TextColor3 = Color3.fromRGB(220,220,220), TextSize = 13, TextXAlignment = Enum.TextXAlignment.Left, ZIndex = 5})
+                local Box = Make("TextBox", {Parent = IF, BackgroundColor3 = Color3.fromRGB(30,30,30), Size = UDim2.new(0.4,0,0,25), Position = UDim2.new(0.6,-10,0.5,-12.5), Font = Enum.Font.Gotham, PlaceholderText = PlaceHolder, Text = Library.Flags[Flag], TextColor3 = Color3.fromRGB(255,255,255), TextSize = 12, ClearTextOnFocus = false, ZIndex = 5})
+                Make("UICorner", {Parent = Box, CornerRadius = UDim.new(0, 4)})
+                Box.Focused:Connect(function() Box.Text = "" end)
+                Box.FocusLost:Connect(function() Library.Flags[Flag] = Box.Text; pcall(Call, Box.Text) end)
+            end
+
+            function Elements:CreateColorPicker(Flag, CName, DefColor, Call)
+                Library.Flags[Flag] = Library.Flags[Flag] or {DefColor.R, DefColor.G, DefColor.B}
+                local CF = Make("Frame", {Parent = TContent, BackgroundColor3 = Color3.fromRGB(45,45,45), Size = UDim2.new(1,-10,0,35), ZIndex = 4})
+                Make("UICorner", {Parent = CF, CornerRadius = UDim.new(0, 6)})
+                Make("TextLabel", {Parent = CF, BackgroundTransparency = 1, Size = UDim2.new(0.6,0,1,0), Position = UDim2.new(0,10,0,0), Font = Enum.Font.Gotham, Text = CName, TextColor3 = Color3.fromRGB(220,220,220), TextSize = 13, TextXAlignment = Enum.TextXAlignment.Left, ZIndex = 5})
+                
+                local CBtn = Make("TextButton", {Parent = CF, BackgroundColor3 = Color3.fromRGB(Library.Flags[Flag][1]*255, Library.Flags[Flag][2]*255, Library.Flags[Flag][3]*255), Position = UDim2.new(1,-40,0.5,-10), Size = UDim2.new(0,30,0,20), Text = "", ZIndex = 5})
+                Make("UICorner", {Parent = CBtn, CornerRadius = UDim.new(0,4)})
+                
+                local RGBBox = Make("TextBox", {Parent = CF, BackgroundColor3 = Color3.fromRGB(30,30,30), Size = UDim2.new(0, 60, 0, 20), Position = UDim2.new(1, -110, 0.5, -10), Font = Enum.Font.Gotham, PlaceholderText = "R,G,B", Text = "", TextColor3 = Color3.fromRGB(255,255,255), TextSize = 11, ZIndex = 5})
+                Make("UICorner", {Parent = RGBBox, CornerRadius = UDim.new(0, 4)})
+
+                RGBBox.FocusLost:Connect(function()
+                    local r, g, b = RGBBox.Text:match("(%d+),%s*(%d+),%s*(%d+)")
+                    if r and g and b then
+                        r, g, b = math.clamp(tonumber(r), 0, 255), math.clamp(tonumber(g), 0, 255), math.clamp(tonumber(b), 0, 255)
+                        Library.Flags[Flag] = {r/255, g/255, b/255}
+                        CBtn.BackgroundColor3 = Color3.fromRGB(r, g, b)
+                        pcall(Call, Color3.fromRGB(r, g, b))
+                    end
+                    RGBBox.Text = ""
+                end)
+            end
+
+            function Elements:CreateKeybind(Flag, KName, DefKey, Call)
+                Library.Flags[Flag] = Library.Flags[Flag] or DefKey.Name
+                local KF = Make("Frame", {Parent = TContent, BackgroundColor3 = Color3.fromRGB(45,45,45), Size = UDim2.new(1,-10,0,35), ZIndex = 4})
+                Make("UICorner", {Parent = KF, CornerRadius = UDim.new(0, 6)})
+                Make("TextLabel", {Parent = KF, BackgroundTransparency = 1, Size = UDim2.new(0.5,0,1,0), Position = UDim2.new(0,10,0,0), Font = Enum.Font.Gotham, Text = KName, TextColor3 = Color3.fromRGB(220,220,220), TextSize = 13, TextXAlignment = Enum.TextXAlignment.Left, ZIndex = 5})
+                local KBtn = Make("TextButton", {Parent = KF, BackgroundColor3 = Color3.fromRGB(60,60,60), Size = UDim2.new(0,80,0,25), Position = UDim2.new(1,-90,0.5,-12.5), Font = Enum.Font.GothamSemibold, Text = Library.Flags[Flag], TextColor3 = Color3.fromRGB(200,200,200), TextSize = 12, ZIndex = 5})
+                Make("UICorner", {Parent = KBtn, CornerRadius = UDim.new(0, 4)})
+                
+                local Key = Enum.KeyCode[Library.Flags[Flag]] or DefKey
+                KBtn.MouseButton1Click:Connect(function()
+                    KBtn.Text = "..."
+                    local conn; conn = UIS.InputBegan:Connect(function(i)
+                        if i.UserInputType == Enum.UserInputType.Keyboard then
+                            Key = i.KeyCode; Library.Flags[Flag] = Key.Name; KBtn.Text = Key.Name; conn:Disconnect()
+                        end
+                    end)
+                end)
+                table.insert(Library.Connections, UIS.InputBegan:Connect(function(i, gp) if gp then return end; if i.KeyCode == Key then pcall(Call) end end))
+            end
+
+            return Elements
+        end return WinObj
+    end
+
+    if UseKey then
+        local AuthMain = Make("Frame", {Parent = SG, BackgroundColor3 = Color3.fromRGB(30,30,30), Position = UDim2.new(0.5, -150, 0.5, -75), Size = UDim2.new(0, 300, 0, 150), ClipsDescendants = true, ZIndex = 10})
+        Make("UICorner", {Parent = AuthMain, CornerRadius = UDim.new(0, 10)})
+        local AuthTop = Make("Frame", {Parent = AuthMain, BackgroundColor3 = Color3.fromRGB(40,40,40), Size = UDim2.new(1, 0, 0, 30), ZIndex = 11}); Make("UICorner", {Parent = AuthTop, CornerRadius = UDim.new(0, 10)})
+        Make("Frame", {Parent = AuthTop, BackgroundColor3 = Color3.fromRGB(40,40,40), Position = UDim2.new(0,0,0.5,0), Size = UDim2.new(1,0,0.5,0), BorderSizePixel = 0, ZIndex = 11})
+        Make("TextLabel", {Parent = AuthTop, BackgroundTransparency = 1, Position = UDim2.new(0,10,0,0), Size = UDim2.new(1,-20,1,0), Font = Enum.Font.GothamSemibold, Text = "Authentication", TextColor3 = Color3.fromRGB(200,200,200), TextSize = 13, TextXAlignment = Enum.TextXAlignment.Center, ZIndex = 12})
+        
+        local KeyBox = Make("TextBox", {Parent = AuthMain, BackgroundColor3 = Color3.fromRGB(45,45,45), Position = UDim2.new(0.1, 0, 0.4, 0), Size = UDim2.new(0.8, 0, 0, 30), Font = Enum.Font.Gotham, PlaceholderText = "Enter Key Here...", Text = "", TextColor3 = Color3.fromRGB(255,255,255), TextSize = 13, ZIndex = 11})
+        Make("UICorner", {Parent = KeyBox, CornerRadius = UDim.new(0, 6)})
+
+        local VerifyBtn = Make("TextButton", {Parent = AuthMain, BackgroundColor3 = Color3.fromRGB(10,132,255), Position = UDim2.new(0.1, 0, 0.7, 0), Size = UDim2.new(0.8, 0, 0, 30), Font = Enum.Font.GothamBold, Text = "Verify Key", TextColor3 = Color3.fromRGB(255,255,255), TextSize = 13, ZIndex = 11})
+        Make("UICorner", {Parent = VerifyBtn, CornerRadius = UDim.new(0, 6)})
+
+        VerifyBtn.MouseButton1Click:Connect(function()
+            if KeyBox.Text == ExpectedKey then
+                TS:Create(AuthMain, TweenInfo.new(0.3), {Size = UDim2.new(0,0,0,0), BackgroundTransparency = 1}):Play()
+                task.wait(0.3); AuthMain:Destroy()
+                Library:Notify("Access Granted", "Welcome back to " .. Name, 4)
+                return LoadMainUI()
+            else
+                Library:Notify("Error", "Invalid Key!", 3)
+            end
+        end)
+    else
+        return LoadMainUI()
+    end
+end
+
+return Library
