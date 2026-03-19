@@ -1,7 +1,3 @@
--- ==========================================
--- KEMPLONGXD HUB V8 (AESTHETIC EDITION) - BAGIAN 1
--- Copy semua kode di bawah ini terlebih dahulu
--- ==========================================
 local Library = { Flags = {}, Connections = {}, ToggleKey = Enum.KeyCode.RightControl }
 local TS = game:GetService("TweenService")
 local UIS = game:GetService("UserInputService")
@@ -10,16 +6,15 @@ local RunService = game:GetService("RunService")
 local Stats = game:GetService("Stats")
 local ParentGui = (gethui and gethui()) or (pcall(function() return game:GetService("CoreGui").Name end) and game:GetService("CoreGui")) or game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
 
--- macOS Dark Mode Palette
 local Theme = {
     Main = Color3.fromRGB(24, 24, 25),
-    Sidebar = Color3.fromRGB(18, 18, 19),
+    TopBar = Color3.fromRGB(18, 18, 19),
     Element = Color3.fromRGB(32, 32, 34),
     Stroke = Color3.fromRGB(50, 50, 52),
     Text = Color3.fromRGB(240, 240, 240),
     SubText = Color3.fromRGB(150, 150, 150),
-    Accent = Color3.fromRGB(10, 132, 255), -- Apple Blue
-    Success = Color3.fromRGB(48, 209, 88)  -- Apple Green
+    Accent = Color3.fromRGB(10, 132, 255),
+    Success = Color3.fromRGB(48, 209, 88)
 }
 
 local function Make(Class, Props)
@@ -72,22 +67,23 @@ function Library:Notify(Title, Content, Duration)
 end
 
 function Library:CreateWindow(Config)
+    Library:Unload() -- Auto clean-up prevent memory leak
+    
     local Name = Config.Name or "MacOS UI"
     local UseKey = Config.UseKey or false
     local ExpectedKey = Config.Key or "ilmuireng1337"
 
-    if ParentGui:FindFirstChild("MacOS_UI") then ParentGui.MacOS_UI:Destroy() end
     local SG = Make("ScreenGui", {Parent = ParentGui, Name = "MacOS_UI", ResetOnSpawn = false, ZIndexBehavior = Enum.ZIndexBehavior.Sibling})
     Library.UI = SG; NotifContainer.Parent = SG
 
     local function LoadMainUI()
-        -- Sleek Watermark
         local WMFrame = Make("Frame", {Parent = SG, BackgroundColor3 = Theme.Main, Position = UDim2.new(0, 15, 0, 15), Size = UDim2.new(0, 240, 0, 26), ZIndex = 100})
         Make("UICorner", {Parent = WMFrame, CornerRadius = UDim.new(0, 6)}); AddStroke(WMFrame, 1, Theme.Stroke)
         local WMLabel = Make("TextLabel", {Parent = WMFrame, BackgroundTransparency = 1, Size = UDim2.new(1, -20, 1, 0), Position = UDim2.new(0, 10, 0, 0), Font = Enum.Font.Gotham, Text = Name .. " | FPS: 0 | Ping: 0ms", TextColor3 = Theme.SubText, TextSize = 12, TextXAlignment = Enum.TextXAlignment.Left, ZIndex = 101})
         
         local LastTick, FrameCount = tick(), 0
         table.insert(Library.Connections, RunService.RenderStepped:Connect(function()
+            if not WMLabel or not WMLabel.Parent then return end -- Safe check
             FrameCount = FrameCount + 1
             if tick() - LastTick >= 1 then
                 local pcallSuccess, PingData = pcall(function() return Stats.Network.ServerStatsItem["Data Ping"]:GetValueString() end)
@@ -97,14 +93,15 @@ function Library:CreateWindow(Config)
             end
         end))
 
-        local MainSizeDef, MainSizeMax, MainSizeMin = UDim2.new(0, 550, 0, 380), UDim2.new(0, 700, 0, 480), UDim2.new(0, 550, 0, 34)
-        local Main = Make("Frame", {Parent = SG, BackgroundColor3 = Theme.Main, Position = UDim2.new(0.5, -275, 0.5, -190), Size = MainSizeDef, ClipsDescendants = true, ZIndex = 1})
+        local MainSizeDef, MainSizeMax, MainSizeMin = UDim2.new(0, 550, 0, 400), UDim2.new(0, 700, 0, 500), UDim2.new(0, 550, 0, 34)
+        local Main = Make("Frame", {Parent = SG, BackgroundColor3 = Theme.Main, Position = UDim2.new(0.5, -275, 0.5, -200), Size = MainSizeDef, ClipsDescendants = true, ZIndex = 1, GroupTransparency = UseKey and 1 or 0})
         Make("UICorner", {Parent = Main, CornerRadius = UDim.new(0, 10)}); AddStroke(Main, 1, Theme.Stroke)
         
+        if UseKey then TS:Create(Main, TweenInfo.new(0.6, Enum.EasingStyle.Quint), {GroupTransparency = 0}):Play() end
+
         local Top = Make("Frame", {Parent = Main, BackgroundTransparency = 1, Size = UDim2.new(1, 0, 0, 34), ZIndex = 2})
-        Make("Frame", {Parent = Top, BackgroundColor3 = Theme.Stroke, Size = UDim2.new(1, 0, 0, 1), Position = UDim2.new(0, 0, 1, 0), BorderSizePixel = 0, ZIndex = 2}) -- Subtle Divider
+        Make("Frame", {Parent = Top, BackgroundColor3 = Theme.Stroke, Size = UDim2.new(1, 0, 0, 1), Position = UDim2.new(0, 0, 1, 0), BorderSizePixel = 0, ZIndex = 2})
         
-        -- Elegant Traffic Lights (Smaller 10px)
         local CloseBtn = Make("TextButton", {Parent = Top, BackgroundColor3 = Color3.fromRGB(255,95,86), Size = UDim2.new(0,10,0,10), Position = UDim2.new(0,14,0.5,-5), ZIndex = 3, Text = ""}); Make("UICorner", {Parent = CloseBtn, CornerRadius = UDim.new(1,0)}); AddStroke(CloseBtn, 1, Color3.fromRGB(224,68,62))
         local MinBtn = Make("TextButton", {Parent = Top, BackgroundColor3 = Color3.fromRGB(255,189,46), Size = UDim2.new(0,10,0,10), Position = UDim2.new(0,30,0.5,-5), ZIndex = 3, Text = ""}); Make("UICorner", {Parent = MinBtn, CornerRadius = UDim.new(1,0)}); AddStroke(MinBtn, 1, Color3.fromRGB(223,161,35))
         local MaxBtn = Make("TextButton", {Parent = Top, BackgroundColor3 = Theme.Success, Size = UDim2.new(0,10,0,10), Position = UDim2.new(0,46,0.5,-5), ZIndex = 3, Text = ""}); Make("UICorner", {Parent = MaxBtn, CornerRadius = UDim.new(1,0)}); AddStroke(MaxBtn, 1, Color3.fromRGB(39,176,57))
@@ -121,55 +118,45 @@ function Library:CreateWindow(Config)
         table.insert(Library.Connections, UIS.InputEnded:Connect(function(i) if i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.Touch then drag = false end end))
         table.insert(Library.Connections, UIS.InputBegan:Connect(function(i, gp) if gp then return end; if i.KeyCode == Library.ToggleKey then Main.Visible = not Main.Visible end end))
 
-        -- Aesthetic Sidebar
-        local Sidebar = Make("ScrollingFrame", {Parent = Main, BackgroundColor3 = Theme.Sidebar, Position = UDim2.new(0,0,0,34), Size = UDim2.new(0,140,1,-34), ScrollBarThickness = 0, BorderSizePixel = 0, ZIndex = 2})
-        Make("Frame", {Parent = Sidebar, BackgroundColor3 = Theme.Stroke, Size = UDim2.new(0, 1, 1, 0), Position = UDim2.new(1, -1, 0, 0), BorderSizePixel = 0, ZIndex = 3}) -- Right Border
-        local SideLayout = Make("UIListLayout", {Parent = Sidebar, Padding = UDim.new(0, 4), HorizontalAlignment = Enum.HorizontalAlignment.Center})
-        Make("UIPadding", {Parent = Sidebar, PaddingTop = UDim.new(0, 10)})
+        local TabBar = Make("ScrollingFrame", {Parent = Main, BackgroundColor3 = Theme.TopBar, Position = UDim2.new(0,0,0,35), Size = UDim2.new(1,0,0,36), ScrollBarThickness = 0, BorderSizePixel = 0, ZIndex = 2, AutomaticCanvasSize = Enum.AutomaticSize.X, CanvasSize = UDim2.new(0,0,0,0)})
+        Make("Frame", {Parent = TabBar, BackgroundColor3 = Theme.Stroke, Size = UDim2.new(1, 0, 0, 1), Position = UDim2.new(0, 0, 1, -1), BorderSizePixel = 0, ZIndex = 3})
+        Make("UIListLayout", {Parent = TabBar, Padding = UDim.new(0, 15), FillDirection = Enum.FillDirection.Horizontal, HorizontalAlignment = Enum.HorizontalAlignment.Left, VerticalAlignment = Enum.VerticalAlignment.Center})
+        Make("UIPadding", {Parent = TabBar, PaddingLeft = UDim.new(0, 15), PaddingRight = UDim.new(0, 15)})
         
-        local Content = Make("Frame", {Parent = Main, BackgroundTransparency = 1, Position = UDim2.new(0,140,0,34), Size = UDim2.new(1,-140,1,-34), ZIndex = 2})
-        SideLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function() Sidebar.CanvasSize = UDim2.new(0, 0, 0, SideLayout.AbsoluteContentSize.Y + 20) end)
+        local Content = Make("Frame", {Parent = Main, BackgroundTransparency = 1, Position = UDim2.new(0,0,0,72), Size = UDim2.new(1,0,1,-72), ZIndex = 2})
 
         local WinObj, FirstTab = {}, true
 
         function WinObj:CreateTab(TabName)
-            local TBtn = Make("TextButton", {Parent = Sidebar, BackgroundTransparency = 1, Size = UDim2.new(1,-16,0,32), Font = Enum.Font.GothamMedium, Text = "   " .. TabName, TextColor3 = FirstTab and Theme.Text or Theme.SubText, TextSize = 13, TextXAlignment = Enum.TextXAlignment.Left, ZIndex = 4})
-            Make("UICorner", {Parent = TBtn, CornerRadius = UDim.new(0, 6)})
-            local Indicator = Make("Frame", {Parent = TBtn, BackgroundColor3 = Theme.Accent, Size = UDim2.new(0, 3, 0, 14), Position = UDim2.new(0, 4, 0.5, -7), ZIndex = 5, BackgroundTransparency = FirstTab and 0 or 1})
+            local TBtn = Make("TextButton", {Parent = TabBar, BackgroundTransparency = 1, Size = UDim2.new(0,0,1,0), AutomaticSize = Enum.AutomaticSize.X, Font = Enum.Font.GothamMedium, Text = TabName, TextColor3 = FirstTab and Theme.Text or Theme.SubText, TextSize = 13, ZIndex = 4})
+            local Indicator = Make("Frame", {Parent = TBtn, BackgroundColor3 = Theme.Accent, Size = UDim2.new(1, 4, 0, 2), Position = UDim2.new(0, -2, 1, -2), ZIndex = 5, BackgroundTransparency = FirstTab and 0 or 1})
             Make("UICorner", {Parent = Indicator, CornerRadius = UDim.new(1, 0)})
             
-            local TContent = Make("ScrollingFrame", {Parent = Content, BackgroundTransparency = 1, Size = UDim2.new(1,0,1,0), ScrollBarThickness = 2, ScrollBarImageColor3 = Theme.Stroke, Visible = FirstTab, BorderSizePixel = 0, ZIndex = 3})
-            local CntLayout = Make("UIListLayout", {Parent = TContent, Padding = UDim.new(0, 8), HorizontalAlignment = Enum.HorizontalAlignment.Center})
+            local TContent = Make("ScrollingFrame", {Parent = Content, BackgroundTransparency = 1, Size = UDim2.new(1,0,1,0), ScrollBarThickness = 2, ScrollBarImageColor3 = Theme.Stroke, Visible = FirstTab, BorderSizePixel = 0, ZIndex = 3, AutomaticCanvasSize = Enum.AutomaticSize.Y, CanvasSize = UDim2.new(0,0,0,0)})
+            Make("UIListLayout", {Parent = TContent, Padding = UDim.new(0, 8), HorizontalAlignment = Enum.HorizontalAlignment.Center})
             Make("UIPadding", {Parent = TContent, PaddingTop = UDim.new(0, 14), PaddingBottom = UDim.new(0, 14)})
-            
-            CntLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function() TContent.CanvasSize = UDim2.new(0, 0, 0, CntLayout.AbsoluteContentSize.Y + 30) end)
             FirstTab = false
 
             TBtn.MouseButton1Click:Connect(function()
-                for _, c in ipairs(Sidebar:GetChildren()) do 
+                for _, c in ipairs(TabBar:GetChildren()) do 
                     if c:IsA("TextButton") then 
-                        TS:Create(c, TweenInfo.new(0.3), {BackgroundColor3 = Theme.Sidebar, BackgroundTransparency = 1, TextColor3 = Theme.SubText}):Play() 
+                        TS:Create(c, TweenInfo.new(0.3), {TextColor3 = Theme.SubText}):Play() 
                         TS:Create(c:FindFirstChild("Frame"), TweenInfo.new(0.3), {BackgroundTransparency = 1}):Play()
                     end 
                 end
                 for _, c in ipairs(Content:GetChildren()) do if c:IsA("ScrollingFrame") then c.Visible = false end end
-                TS:Create(TBtn, TweenInfo.new(0.3), {BackgroundColor3 = Theme.Element, BackgroundTransparency = 0.5, TextColor3 = Theme.Text}):Play()
+                TS:Create(TBtn, TweenInfo.new(0.3), {TextColor3 = Theme.Text}):Play()
                 TS:Create(Indicator, TweenInfo.new(0.3), {BackgroundTransparency = 0}):Play()
                 TContent.Visible = true
             end)
-            if TBtn.TextColor3 == Theme.Text then TS:Create(TBtn, TweenInfo.new(0), {BackgroundColor3 = Theme.Element, BackgroundTransparency = 0.5}):Play() end
 
             local Elements = {}
-
             function Elements:CreateSection(SName)
                 local Sec = Make("Frame", {Parent = TContent, BackgroundTransparency = 1, Size = UDim2.new(1,-24,0,26), ZIndex = 4})
-                Make("TextLabel", {Parent = Sec, BackgroundTransparency = 1, Size = UDim2.new(1,0,1,0), Font = Enum.Font.GothamMedium, Text = SName, TextColor3 = Theme.Accent, TextSize = 12, TextXAlignment = Enum.TextXAlignment.Left, ZIndex = 4})
+                Make("TextLabel", {Parent = Sec, BackgroundTransparency = 1, Size = UDim2.new(1,0,1,0), Font = Enum.Font.GothamBold, Text = SName, TextColor3 = Theme.Accent, TextSize = 12, TextXAlignment = Enum.TextXAlignment.Left, ZIndex = 4})
                 Make("Frame", {Parent = Sec, BackgroundColor3 = Theme.Stroke, Size = UDim2.new(1,0,0,1), Position = UDim2.new(0,0,1,0), BorderSizePixel = 0, ZIndex = 4})
             end
--- ==========================================
--- KEMPLONGXD HUB V8 (AESTHETIC EDITION) - BAGIAN 2
--- Paste kode ini persis di bawah baris terakhir Bagian 1
--- ==========================================
+
             function Elements:CreateLabel(Text) Make("TextLabel", {Parent = TContent, BackgroundTransparency = 1, Size = UDim2.new(1,-24,0,20), Font = Enum.Font.Gotham, Text = Text, TextColor3 = Theme.SubText, TextSize = 13, TextXAlignment = Enum.TextXAlignment.Left, ZIndex = 4}) end
             
             function Elements:CreateParagraph(Title, Desc)
@@ -187,7 +174,6 @@ function Library:CreateWindow(Config)
                 Btn.MouseButton1Click:Connect(function() pcall(Call); TS:Create(Btn, TweenInfo.new(0.15), {BackgroundColor3 = Theme.Stroke}):Play(); task.wait(0.15); TS:Create(Btn, TweenInfo.new(0.15), {BackgroundColor3 = Theme.Element}):Play() end)
             end
 
-            -- iOS Style Toggle
             function Elements:CreateToggle(Flag, TName, Call)
                 Library.Flags[Flag] = Library.Flags[Flag] or false
                 local TF = Make("Frame", {Parent = TContent, BackgroundColor3 = Theme.Element, Size = UDim2.new(1,-24,0,38), ZIndex = 4})
@@ -197,7 +183,7 @@ function Library:CreateWindow(Config)
                 local Sw = Make("TextButton", {Parent = TF, BackgroundColor3 = Library.Flags[Flag] and Theme.Success or Theme.Stroke, Position = UDim2.new(1,-46,0.5,-10), Size = UDim2.new(0,34,0,20), Text = "", ZIndex = 5})
                 Make("UICorner", {Parent = Sw, CornerRadius = UDim.new(1, 0)})
                 local Ind = Make("Frame", {Parent = Sw, BackgroundColor3 = Color3.fromRGB(255,255,255), Position = Library.Flags[Flag] and UDim2.new(0,16,0.5,-8) or UDim2.new(0,2,0.5,-8), Size = UDim2.new(0,16,0,16), ZIndex = 6})
-                Make("UICorner", {Parent = Ind, CornerRadius = UDim.new(1, 0)}); AddStroke(Ind, 1, Color3.fromRGB(0,0,0)) -- Simulate tiny shadow
+                Make("UICorner", {Parent = Ind, CornerRadius = UDim.new(1, 0)}); AddStroke(Ind, 1, Color3.fromRGB(0,0,0))
                 
                 local function Set(state)
                     Library.Flags[Flag] = state; pcall(Call, state)
@@ -208,7 +194,6 @@ function Library:CreateWindow(Config)
                 if Library.Flags[Flag] then pcall(Call, true) end
             end
 
-            -- Slim Slider with Thumb
             function Elements:CreateSlider(Flag, SName, Min, Max, Def, Call)
                 Library.Flags[Flag] = Library.Flags[Flag] or Def
                 local SF = Make("Frame", {Parent = TContent, BackgroundColor3 = Theme.Element, Size = UDim2.new(1,-24,0,50), ZIndex = 4})
@@ -232,14 +217,13 @@ function Library:CreateWindow(Config)
                 table.insert(Library.Connections, UIS.InputChanged:Connect(function(i) if drag and (i.UserInputType == Enum.UserInputType.MouseMovement or i.UserInputType == Enum.UserInputType.Touch) then update(i) end end))
             end
 
-            -- Sleek Dropdown
             function Elements:CreateDropdown(Flag, DName, Opts, Call)
                 Library.Flags[Flag] = Library.Flags[Flag] or ""
                 local DF = Make("Frame", {Parent = TContent, BackgroundColor3 = Theme.Element, Size = UDim2.new(1,-24,0,38), ClipsDescendants = true, ZIndex = 4})
                 Make("UICorner", {Parent = DF, CornerRadius = UDim.new(0, 8)}); AddStroke(DF, 1, Theme.Stroke)
                 local DBtn = Make("TextButton", {Parent = DF, BackgroundTransparency = 1, Size = UDim2.new(1,0,0,38), Font = Enum.Font.Gotham, Text = "   " .. DName .. " : " .. (Library.Flags[Flag] == "" and "..." or tostring(Library.Flags[Flag])), TextColor3 = Theme.Text, TextSize = 13, TextXAlignment = Enum.TextXAlignment.Left, ZIndex = 5})
                 local Chevron = Make("TextLabel", {Parent = DBtn, BackgroundTransparency = 1, Size = UDim2.new(0,20,1,0), Position = UDim2.new(1,-25,0,0), Font = Enum.Font.GothamMedium, Text = "+", TextColor3 = Theme.SubText, TextSize = 16, ZIndex = 5})
-                local DScroll = Make("ScrollingFrame", {Parent = DF, BackgroundTransparency = 1, Position = UDim2.new(0,0,0,38), Size = UDim2.new(1,0,1,-44), ScrollBarThickness = 2, ScrollBarImageColor3 = Theme.Stroke, BorderSizePixel = 0, ZIndex = 5})
+                local DScroll = Make("ScrollingFrame", {Parent = DF, BackgroundTransparency = 1, Position = UDim2.new(0,0,0,38), Size = UDim2.new(1,0,1,-44), ScrollBarThickness = 2, ScrollBarImageColor3 = Theme.Stroke, BorderSizePixel = 0, ZIndex = 5, AutomaticCanvasSize = Enum.AutomaticSize.Y, CanvasSize = UDim2.new(0,0,0,0)})
                 Make("UIListLayout", {Parent = DScroll, Padding = UDim.new(0, 2), HorizontalAlignment = Enum.HorizontalAlignment.Center})
 
                 local open = false
@@ -317,7 +301,7 @@ function Library:CreateWindow(Config)
     end
 
     if UseKey then
-        local AuthMain = Make("Frame", {Parent = SG, BackgroundColor3 = Theme.Main, Position = UDim2.new(0.5, -150, 0.5, -80), Size = UDim2.new(0, 300, 0, 160), ClipsDescendants = true, ZIndex = 10})
+        local AuthMain = Make("Frame", {Parent = SG, BackgroundColor3 = Theme.Main, Position = UDim2.new(0.5, -150, 0.5, -80), Size = UDim2.new(0, 300, 0, 160), ClipsDescendants = true, ZIndex = 10, GroupTransparency = 0})
         Make("UICorner", {Parent = AuthMain, CornerRadius = UDim.new(0, 10)}); AddStroke(AuthMain, 1, Theme.Stroke)
         local AuthTop = Make("Frame", {Parent = AuthMain, BackgroundTransparency = 1, Size = UDim2.new(1, 0, 0, 36), ZIndex = 11})
         Make("Frame", {Parent = AuthTop, BackgroundColor3 = Theme.Stroke, Size = UDim2.new(1, 0, 0, 1), Position = UDim2.new(0, 0, 1, 0), BorderSizePixel = 0, ZIndex = 11})
@@ -331,7 +315,7 @@ function Library:CreateWindow(Config)
 
         VerifyBtn.MouseButton1Click:Connect(function()
             if KeyBox.Text == ExpectedKey then
-                TS:Create(AuthMain, TweenInfo.new(0.4, Enum.EasingStyle.Quint), {Size = UDim2.new(0,0,0,0), BackgroundTransparency = 1}):Play()
+                TS:Create(AuthMain, TweenInfo.new(0.4, Enum.EasingStyle.Quint), {GroupTransparency = 1, Size = UDim2.new(0,280,0,140)}):Play()
                 task.wait(0.4); AuthMain:Destroy(); Library:Notify("Access Granted", "Welcome to " .. Name, 4); return LoadMainUI()
             else
                 Library:Notify("Error", "Invalid Key!", 3)
