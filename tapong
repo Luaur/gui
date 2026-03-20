@@ -1,0 +1,1001 @@
+local CoreGui = game:GetService("CoreGui")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
+local Players = game:GetService("Players")
+local TeleportService = game:GetService("TeleportService")
+local GuiService = game:GetService("GuiService")
+local VirtualUser = game:GetService("VirtualUser")
+
+local Player = Players.LocalPlayer
+
+if CoreGui:FindFirstChild("MacOS_FishingGUI") then
+    CoreGui.MacOS_FishingGUI:Destroy()
+end
+
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "MacOS_FishingGUI"
+ScreenGui.Parent = CoreGui
+ScreenGui.ResetOnSpawn = false
+
+local MainFrame = Instance.new("Frame")
+MainFrame.Name = "MainFrame"
+MainFrame.Size = UDim2.new(0, 350, 0, 380)
+MainFrame.Position = UDim2.new(0.5, -175, 0.5, -190)
+MainFrame.BackgroundColor3 = Color3.fromRGB(36, 36, 36)
+MainFrame.BorderSizePixel = 0
+MainFrame.Parent = ScreenGui
+
+local MainCorner = Instance.new("UICorner")
+MainCorner.CornerRadius = UDim.new(0, 10)
+MainCorner.Parent = MainFrame
+
+local MainStroke = Instance.new("UIStroke")
+MainStroke.Color = Color3.fromRGB(60, 60, 60)
+MainStroke.Thickness = 1
+MainStroke.Parent = MainFrame
+
+local TopBar = Instance.new("Frame")
+TopBar.Name = "TopBar"
+TopBar.Size = UDim2.new(1, 0, 0, 28)
+TopBar.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+TopBar.BorderSizePixel = 0
+TopBar.Parent = MainFrame
+
+local TopCorner = Instance.new("UICorner")
+TopCorner.CornerRadius = UDim.new(0, 10)
+TopCorner.Parent = TopBar
+
+local TopBarHider = Instance.new("Frame")
+TopBarHider.Size = UDim2.new(1, 0, 0, 5)
+TopBarHider.Position = UDim2.new(0, 0, 1, -5)
+TopBarHider.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+TopBarHider.BorderSizePixel = 0
+TopBarHider.Parent = TopBar
+
+local TopDivider = Instance.new("Frame")
+TopDivider.Size = UDim2.new(1, 0, 0, 1)
+TopDivider.Position = UDim2.new(0, 0, 1, 0)
+TopDivider.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+TopDivider.BorderSizePixel = 0
+TopDivider.Parent = TopBar
+
+local function createMacButton(name, color, posX)
+    local btn = Instance.new("TextButton")
+    btn.Name = name
+    btn.Size = UDim2.new(0, 12, 0, 12)
+    btn.Position = UDim2.new(0, posX, 0, 8)
+    btn.BackgroundColor3 = color
+    btn.Text = ""
+    btn.Parent = TopBar
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(1, 0)
+    corner.Parent = btn
+    local stroke = Instance.new("UIStroke")
+    stroke.Color = Color3.fromRGB(0, 0, 0)
+    stroke.Transparency = 0.8
+    stroke.Thickness = 1
+    stroke.Parent = btn
+    return btn
+end
+
+local CloseBtn = createMacButton("Close", Color3.fromRGB(255, 95, 86), 14)
+local MinBtn = createMacButton("Minimize", Color3.fromRGB(255, 189, 46), 34)
+local MaxBtn = createMacButton("Maximize", Color3.fromRGB(39, 201, 63), 54)
+
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1, 0, 1, 0)
+Title.BackgroundTransparency = 1
+Title.Text = "KemplongXD Hub | Key: ilmuireng1337"
+Title.TextColor3 = Color3.fromRGB(210, 210, 210)
+Title.Font = Enum.Font.GothamMedium
+Title.TextSize = 12
+Title.ZIndex = 2
+Title.Parent = TopBar
+
+local TabBar = Instance.new("Frame")
+TabBar.Name = "TabBar"
+TabBar.Size = UDim2.new(1, 0, 0, 32)
+TabBar.Position = UDim2.new(0, 0, 0, 29)
+TabBar.BackgroundColor3 = Color3.fromRGB(42, 42, 42)
+TabBar.BorderSizePixel = 0
+TabBar.Parent = MainFrame
+
+local TabDivider = Instance.new("Frame")
+TabDivider.Size = UDim2.new(1, 0, 0, 1)
+TabDivider.Position = UDim2.new(0, 0, 1, 0)
+TabDivider.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+TabDivider.BorderSizePixel = 0
+TabDivider.Parent = TabBar
+
+local function createTabBtn(name, posScale)
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(0.2, 0, 1, 0)
+    btn.Position = UDim2.new(posScale, 0, 0, 0)
+    btn.BackgroundColor3 = Color3.fromRGB(42, 42, 42)
+    btn.Text = name
+    btn.TextColor3 = Color3.fromRGB(160, 160, 160)
+    btn.Font = Enum.Font.GothamMedium
+    btn.TextSize = 11
+    btn.BorderSizePixel = 0
+    btn.Parent = TabBar
+    return btn
+end
+
+local InfoTabBtn = createTabBtn("Info", 0)
+InfoTabBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+InfoTabBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+InfoTabBtn.Font = Enum.Font.GothamBold
+
+local FishingTabBtn = createTabBtn("Fishing", 0.2)
+local SellTabBtn = createTabBtn("Auto Sell", 0.4)
+local TeleportTabBtn = createTabBtn("Teleport", 0.6)
+local ItemsTabBtn = createTabBtn("Items", 0.8)
+
+local PageContainer = Instance.new("Frame")
+PageContainer.Name = "PageContainer"
+PageContainer.Size = UDim2.new(1, 0, 1, -62)
+PageContainer.Position = UDim2.new(0, 0, 0, 62)
+PageContainer.BackgroundTransparency = 1
+PageContainer.Parent = MainFrame
+
+local InfoPage = Instance.new("Frame")
+InfoPage.Size = UDim2.new(1, 0, 1, 0)
+InfoPage.BackgroundTransparency = 1
+InfoPage.Parent = PageContainer
+
+local AvatarImg = Instance.new("ImageLabel")
+AvatarImg.Size = UDim2.new(0, 80, 0, 80)
+AvatarImg.Position = UDim2.new(0.5, -40, 0, 20)
+AvatarImg.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+AvatarImg.Image = Players:GetUserThumbnailAsync(Player.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size420x420)
+AvatarImg.Parent = InfoPage
+local AvatarCorner = Instance.new("UICorner") AvatarCorner.CornerRadius = UDim.new(1, 0) AvatarCorner.Parent = AvatarImg
+local AvatarStroke = Instance.new("UIStroke") AvatarStroke.Color = Color3.fromRGB(70, 70, 70) AvatarStroke.Thickness = 2 AvatarStroke.Parent = AvatarImg
+
+local NameLabel = Instance.new("TextLabel")
+NameLabel.Size = UDim2.new(1, 0, 0, 20)
+NameLabel.Position = UDim2.new(0, 0, 0, 110)
+NameLabel.BackgroundTransparency = 1
+NameLabel.Text = Player.DisplayName
+NameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+NameLabel.Font = Enum.Font.GothamBold
+NameLabel.TextSize = 16
+NameLabel.Parent = InfoPage
+
+local UserLabel = Instance.new("TextLabel")
+UserLabel.Size = UDim2.new(1, 0, 0, 15)
+UserLabel.Position = UDim2.new(0, 0, 0, 130)
+UserLabel.BackgroundTransparency = 1
+UserLabel.Text = "@" .. Player.Name
+UserLabel.TextColor3 = Color3.fromRGB(170, 170, 170)
+UserLabel.Font = Enum.Font.GothamMedium
+UserLabel.TextSize = 12
+UserLabel.Parent = InfoPage
+
+local StatsFrame = Instance.new("Frame")
+StatsFrame.Size = UDim2.new(0, 280, 0, 70)
+StatsFrame.Position = UDim2.new(0.5, -140, 0, 160)
+StatsFrame.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+StatsFrame.Parent = InfoPage
+local StatsCorner = Instance.new("UICorner") StatsCorner.CornerRadius = UDim.new(0, 8) StatsCorner.Parent = StatsFrame
+local StatsStroke = Instance.new("UIStroke") StatsStroke.Color = Color3.fromRGB(70, 70, 70) StatsStroke.Thickness = 1 StatsStroke.Parent = StatsFrame
+
+local AgeLabel = Instance.new("TextLabel")
+AgeLabel.Size = UDim2.new(1, -20, 0.5, 0)
+AgeLabel.Position = UDim2.new(0, 10, 0, 0)
+AgeLabel.BackgroundTransparency = 1
+AgeLabel.Text = "Account Age: " .. tostring(Player.AccountAge) .. " Days"
+AgeLabel.TextColor3 = Color3.fromRGB(230, 230, 230)
+AgeLabel.Font = Enum.Font.GothamMedium
+AgeLabel.TextSize = 13
+AgeLabel.TextXAlignment = Enum.TextXAlignment.Left
+AgeLabel.Parent = StatsFrame
+
+local CaughtLabel = Instance.new("TextLabel")
+CaughtLabel.Size = UDim2.new(1, -20, 0.5, 0)
+CaughtLabel.Position = UDim2.new(0, 10, 0.5, 0)
+CaughtLabel.BackgroundTransparency = 1
+CaughtLabel.Text = "Session Caught: 0"
+CaughtLabel.TextColor3 = Color3.fromRGB(230, 230, 230)
+CaughtLabel.Font = Enum.Font.GothamMedium
+CaughtLabel.TextSize = 13
+CaughtLabel.TextXAlignment = Enum.TextXAlignment.Left
+CaughtLabel.Parent = StatsFrame
+
+local ToggleAntiAFKBtn = Instance.new("TextButton")
+ToggleAntiAFKBtn.Size = UDim2.new(0, 220, 0, 35)
+ToggleAntiAFKBtn.Position = UDim2.new(0.5, -110, 0, 250)
+ToggleAntiAFKBtn.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+ToggleAntiAFKBtn.Text = "ANTI AFK: OFF"
+ToggleAntiAFKBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+ToggleAntiAFKBtn.Font = Enum.Font.GothamBold
+ToggleAntiAFKBtn.TextSize = 13
+ToggleAntiAFKBtn.Parent = InfoPage
+local ToggleAntiAFKCorner = Instance.new("UICorner") ToggleAntiAFKCorner.CornerRadius = UDim.new(0, 8) ToggleAntiAFKCorner.Parent = ToggleAntiAFKBtn
+local ToggleAntiAFKStroke = Instance.new("UIStroke") ToggleAntiAFKStroke.Color = Color3.fromRGB(30, 30, 30) ToggleAntiAFKStroke.Thickness = 1 ToggleAntiAFKStroke.Parent = ToggleAntiAFKBtn
+
+local FishingPage = Instance.new("Frame")
+FishingPage.Size = UDim2.new(1, 0, 1, 0)
+FishingPage.BackgroundTransparency = 1
+FishingPage.Visible = false
+FishingPage.Parent = PageContainer
+
+local StatusLabel = Instance.new("TextLabel")
+StatusLabel.Size = UDim2.new(0, 300, 0, 40)
+StatusLabel.Position = UDim2.new(0.5, -150, 0, 5)
+StatusLabel.BackgroundTransparency = 1
+StatusLabel.Text = "Status: Waiting..."
+StatusLabel.TextColor3 = Color3.fromRGB(210, 210, 210)
+StatusLabel.Font = Enum.Font.Gotham
+StatusLabel.TextSize = 12
+StatusLabel.TextWrapped = true
+StatusLabel.Parent = FishingPage
+
+local DelayLabel = Instance.new("TextLabel")
+DelayLabel.Size = UDim2.new(0, 150, 0, 20)
+DelayLabel.Position = UDim2.new(0.5, -75, 0, 50)
+DelayLabel.BackgroundTransparency = 1
+DelayLabel.Text = "Jeda Cast/Delay (s):"
+DelayLabel.TextColor3 = Color3.fromRGB(210, 210, 210)
+DelayLabel.Font = Enum.Font.Gotham
+DelayLabel.TextSize = 12
+DelayLabel.Parent = FishingPage
+
+local DelayInput = Instance.new("TextBox")
+DelayInput.Size = UDim2.new(0, 100, 0, 25)
+DelayInput.Position = UDim2.new(0.5, -50, 0, 70)
+DelayInput.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+DelayInput.TextColor3 = Color3.fromRGB(255, 255, 255)
+DelayInput.Font = Enum.Font.GothamMedium
+DelayInput.TextSize = 12
+DelayInput.Text = "4"
+DelayInput.Parent = FishingPage
+local InputCorner1 = Instance.new("UICorner") InputCorner1.CornerRadius = UDim.new(0, 6) InputCorner1.Parent = DelayInput
+local InputStroke1 = Instance.new("UIStroke") InputStroke1.Color = Color3.fromRGB(70, 70, 70) InputStroke1.Thickness = 1 InputStroke1.Parent = DelayInput
+
+local ToggleInstantBtn = Instance.new("TextButton")
+ToggleInstantBtn.Size = UDim2.new(0, 220, 0, 35)
+ToggleInstantBtn.Position = UDim2.new(0.5, -110, 0, 110)
+ToggleInstantBtn.BackgroundColor3 = Color3.fromRGB(10, 132, 255)
+ToggleInstantBtn.Text = "START INSTANT FISHING"
+ToggleInstantBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+ToggleInstantBtn.Font = Enum.Font.GothamBold
+ToggleInstantBtn.TextSize = 13
+ToggleInstantBtn.Parent = FishingPage
+local ToggleInstantCorner = Instance.new("UICorner") ToggleInstantCorner.CornerRadius = UDim.new(0, 8) ToggleInstantCorner.Parent = ToggleInstantBtn
+
+local MultiLabel = Instance.new("TextLabel")
+MultiLabel.Size = UDim2.new(0, 150, 0, 20)
+MultiLabel.Position = UDim2.new(0.5, -75, 0, 160)
+MultiLabel.BackgroundTransparency = 1
+MultiLabel.Text = "Jumlah Tarikan:"
+MultiLabel.TextColor3 = Color3.fromRGB(210, 210, 210)
+MultiLabel.Font = Enum.Font.Gotham
+MultiLabel.TextSize = 12
+MultiLabel.Parent = FishingPage
+
+local MultiInput = Instance.new("TextBox")
+MultiInput.Size = UDim2.new(0, 100, 0, 25)
+MultiInput.Position = UDim2.new(0.5, -50, 0, 180)
+MultiInput.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+MultiInput.TextColor3 = Color3.fromRGB(255, 255, 255)
+MultiInput.Font = Enum.Font.GothamMedium
+MultiInput.TextSize = 12
+MultiInput.Text = "10"
+MultiInput.Parent = FishingPage
+local InputCorner2 = Instance.new("UICorner") InputCorner2.CornerRadius = UDim.new(0, 6) InputCorner2.Parent = MultiInput
+local InputStroke2 = Instance.new("UIStroke") InputStroke2.Color = Color3.fromRGB(70, 70, 70) InputStroke2.Thickness = 1 InputStroke2.Parent = MultiInput
+
+local ToggleBlatantBtn = Instance.new("TextButton")
+ToggleBlatantBtn.Size = UDim2.new(0, 220, 0, 35)
+ToggleBlatantBtn.Position = UDim2.new(0.5, -110, 0, 230)
+ToggleBlatantBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+ToggleBlatantBtn.Text = "BLATANT (LOCKED)"
+ToggleBlatantBtn.TextColor3 = Color3.fromRGB(120, 120, 120)
+ToggleBlatantBtn.Font = Enum.Font.GothamBold
+ToggleBlatantBtn.TextSize = 13
+ToggleBlatantBtn.AutoButtonColor = false
+ToggleBlatantBtn.Active = false
+ToggleBlatantBtn.Parent = FishingPage
+local ToggleBlatantCorner = Instance.new("UICorner") ToggleBlatantCorner.CornerRadius = UDim.new(0, 8) ToggleBlatantCorner.Parent = ToggleBlatantBtn
+local SellPage = Instance.new("Frame")
+SellPage.Size = UDim2.new(1, 0, 1, 0)
+SellPage.BackgroundTransparency = 1
+SellPage.Visible = false
+SellPage.Parent = PageContainer
+
+local SellStatusLabel = Instance.new("TextLabel")
+SellStatusLabel.Size = UDim2.new(0, 300, 0, 40)
+SellStatusLabel.Position = UDim2.new(0.5, -150, 0, 5)
+SellStatusLabel.BackgroundTransparency = 1
+SellStatusLabel.Text = "Auto Sell: OFF"
+SellStatusLabel.TextColor3 = Color3.fromRGB(210, 210, 210)
+SellStatusLabel.Font = Enum.Font.Gotham
+SellStatusLabel.TextSize = 12
+SellStatusLabel.TextWrapped = true
+SellStatusLabel.Parent = SellPage
+
+local SellValLabel = Instance.new("TextLabel")
+SellValLabel.Size = UDim2.new(0, 150, 0, 20)
+SellValLabel.Position = UDim2.new(0.5, -75, 0, 50)
+SellValLabel.BackgroundTransparency = 1
+SellValLabel.Text = "Sell Under Value:"
+SellValLabel.TextColor3 = Color3.fromRGB(210, 210, 210)
+SellValLabel.Font = Enum.Font.Gotham
+SellValLabel.TextSize = 12
+SellValLabel.Parent = SellPage
+
+local SellDropdownBtn = Instance.new("TextButton")
+SellDropdownBtn.Size = UDim2.new(0, 100, 0, 25)
+SellDropdownBtn.Position = UDim2.new(0.5, -50, 0, 70)
+SellDropdownBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+SellDropdownBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+SellDropdownBtn.Font = Enum.Font.GothamMedium
+SellDropdownBtn.TextSize = 12
+SellDropdownBtn.Text = "1000"
+SellDropdownBtn.ZIndex = 2
+SellDropdownBtn.Parent = SellPage
+local DropCorner = Instance.new("UICorner") DropCorner.CornerRadius = UDim.new(0, 6) DropCorner.Parent = SellDropdownBtn
+local DropStroke = Instance.new("UIStroke") DropStroke.Color = Color3.fromRGB(70, 70, 70) DropStroke.Thickness = 1 DropStroke.Parent = SellDropdownBtn
+
+local SellDropdownList = Instance.new("Frame")
+SellDropdownList.Size = UDim2.new(0, 100, 0, 100)
+SellDropdownList.Position = UDim2.new(0.5, -50, 0, 98)
+SellDropdownList.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+SellDropdownList.BorderSizePixel = 0
+SellDropdownList.Visible = false
+SellDropdownList.ZIndex = 5
+SellDropdownList.Parent = SellPage
+local ListCorner = Instance.new("UICorner") ListCorner.CornerRadius = UDim.new(0, 6) ListCorner.Parent = SellDropdownList
+local ListStroke = Instance.new("UIStroke") ListStroke.Color = Color3.fromRGB(70, 70, 70) ListStroke.Thickness = 1 ListStroke.Parent = SellDropdownList
+local UIListLayout = Instance.new("UIListLayout") UIListLayout.Parent = SellDropdownList
+
+local sellOptions = {100, 300, 600, 1000}
+for _, val in ipairs(sellOptions) do
+    local optBtn = Instance.new("TextButton")
+    optBtn.Size = UDim2.new(1, 0, 0, 25)
+    optBtn.BackgroundColor3 = Color3.fromRGB(55, 55, 55)
+    optBtn.BackgroundTransparency = 1
+    optBtn.TextColor3 = Color3.fromRGB(230, 230, 230)
+    optBtn.Font = Enum.Font.GothamMedium
+    optBtn.TextSize = 12
+    optBtn.Text = tostring(val)
+    optBtn.ZIndex = 6
+    optBtn.Parent = SellDropdownList
+    optBtn.MouseButton1Click:Connect(function() SellDropdownBtn.Text = tostring(val) SellDropdownList.Visible = false end)
+    optBtn.MouseEnter:Connect(function() optBtn.BackgroundTransparency = 0 end)
+    optBtn.MouseLeave:Connect(function() optBtn.BackgroundTransparency = 1 end)
+end
+
+local SellDelayLabel = Instance.new("TextLabel")
+SellDelayLabel.Size = UDim2.new(0, 150, 0, 20)
+SellDelayLabel.Position = UDim2.new(0.5, -75, 0, 105)
+SellDelayLabel.BackgroundTransparency = 1
+SellDelayLabel.Text = "Jeda Sell (Detik):"
+SellDelayLabel.TextColor3 = Color3.fromRGB(210, 210, 210)
+SellDelayLabel.Font = Enum.Font.Gotham
+SellDelayLabel.TextSize = 12
+SellDelayLabel.ZIndex = 1
+SellDelayLabel.Parent = SellPage
+
+local SellDelayInput = Instance.new("TextBox")
+SellDelayInput.Size = UDim2.new(0, 100, 0, 25)
+SellDelayInput.Position = UDim2.new(0.5, -50, 0, 125)
+SellDelayInput.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+SellDelayInput.TextColor3 = Color3.fromRGB(255, 255, 255)
+SellDelayInput.Font = Enum.Font.GothamMedium
+SellDelayInput.TextSize = 12
+SellDelayInput.Text = "10"
+SellDelayInput.ZIndex = 1
+SellDelayInput.Parent = SellPage
+local InputCorner4 = Instance.new("UICorner") InputCorner4.CornerRadius = UDim.new(0, 6) InputCorner4.Parent = SellDelayInput
+local InputStroke4 = Instance.new("UIStroke") InputStroke4.Color = Color3.fromRGB(70, 70, 70) InputStroke4.Thickness = 1 InputStroke4.Parent = SellDelayInput
+
+local ToggleSellBtn = Instance.new("TextButton")
+ToggleSellBtn.Size = UDim2.new(0, 220, 0, 35)
+ToggleSellBtn.Position = UDim2.new(0.5, -110, 0, 180)
+ToggleSellBtn.BackgroundColor3 = Color3.fromRGB(48, 209, 88)
+ToggleSellBtn.Text = "START AUTO SELL"
+ToggleSellBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+ToggleSellBtn.Font = Enum.Font.GothamBold
+ToggleSellBtn.TextSize = 13
+ToggleSellBtn.ZIndex = 1
+ToggleSellBtn.Parent = SellPage
+local ToggleSellCorner = Instance.new("UICorner") ToggleSellCorner.CornerRadius = UDim.new(0, 8) ToggleSellCorner.Parent = ToggleSellBtn
+
+local TeleportPage = Instance.new("Frame")
+TeleportPage.Size = UDim2.new(1, 0, 1, 0)
+TeleportPage.BackgroundTransparency = 1
+TeleportPage.Visible = false
+TeleportPage.Parent = PageContainer
+
+local ToggleSkywalkBtn = Instance.new("TextButton")
+ToggleSkywalkBtn.Size = UDim2.new(0, 220, 0, 35)
+ToggleSkywalkBtn.Position = UDim2.new(0.5, -110, 0, 10)
+ToggleSkywalkBtn.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+ToggleSkywalkBtn.Text = "SKYWALK: OFF"
+ToggleSkywalkBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+ToggleSkywalkBtn.Font = Enum.Font.GothamBold
+ToggleSkywalkBtn.TextSize = 13
+ToggleSkywalkBtn.Parent = TeleportPage
+local ToggleSkywalkCorner = Instance.new("UICorner") ToggleSkywalkCorner.CornerRadius = UDim.new(0, 8) ToggleSkywalkCorner.Parent = ToggleSkywalkBtn
+
+local LocLabel = Instance.new("TextLabel")
+LocLabel.Size = UDim2.new(0, 200, 0, 20)
+LocLabel.Position = UDim2.new(0.5, -140, 0, 55)
+LocLabel.BackgroundTransparency = 1
+LocLabel.Text = "Teleportasi Lokasi:"
+LocLabel.TextColor3 = Color3.fromRGB(210, 210, 210)
+LocLabel.Font = Enum.Font.GothamMedium
+LocLabel.TextSize = 12
+LocLabel.TextXAlignment = Enum.TextXAlignment.Left
+LocLabel.Parent = TeleportPage
+
+local LocDropBtn = Instance.new("TextButton")
+LocDropBtn.Size = UDim2.new(0, 170, 0, 30)
+LocDropBtn.Position = UDim2.new(0.5, -140, 0, 80)
+LocDropBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+LocDropBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+LocDropBtn.Font = Enum.Font.GothamMedium
+LocDropBtn.TextSize = 12
+LocDropBtn.Text = "Pilih Lokasi"
+LocDropBtn.ZIndex = 2
+LocDropBtn.Parent = TeleportPage
+local LocDropCorner = Instance.new("UICorner") LocDropCorner.CornerRadius = UDim.new(0, 6) LocDropCorner.Parent = LocDropBtn
+
+local LocTpBtn = Instance.new("TextButton")
+LocTpBtn.Size = UDim2.new(0, 100, 0, 30)
+LocTpBtn.Position = UDim2.new(0.5, 40, 0, 80)
+LocTpBtn.BackgroundColor3 = Color3.fromRGB(10, 132, 255)
+LocTpBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+LocTpBtn.Font = Enum.Font.GothamBold
+LocTpBtn.TextSize = 12
+LocTpBtn.Text = "TELEPORT"
+LocTpBtn.Parent = TeleportPage
+local LocTpCorner = Instance.new("UICorner") LocTpCorner.CornerRadius = UDim.new(0, 6) LocTpCorner.Parent = LocTpBtn
+
+local LocDropScroll = Instance.new("ScrollingFrame")
+LocDropScroll.Size = UDim2.new(0, 170, 0, 100)
+LocDropScroll.Position = UDim2.new(0.5, -140, 0, 115)
+LocDropScroll.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+LocDropScroll.BorderSizePixel = 0
+LocDropScroll.CanvasSize = UDim2.new(0, 0, 0, 0)
+LocDropScroll.AutomaticCanvasSize = Enum.AutomaticSize.Y
+LocDropScroll.ScrollBarThickness = 4
+LocDropScroll.Visible = false
+LocDropScroll.ZIndex = 5
+LocDropScroll.Parent = TeleportPage
+local LocScrollCorner = Instance.new("UICorner") LocScrollCorner.CornerRadius = UDim.new(0, 6) LocScrollCorner.Parent = LocDropScroll
+local LocLayout = Instance.new("UIListLayout") LocLayout.Parent = LocDropScroll
+
+local PlyLabel = Instance.new("TextLabel")
+PlyLabel.Size = UDim2.new(0, 200, 0, 20)
+PlyLabel.Position = UDim2.new(0.5, -140, 0, 120)
+PlyLabel.BackgroundTransparency = 1
+PlyLabel.Text = "Teleportasi Pemain:"
+PlyLabel.TextColor3 = Color3.fromRGB(210, 210, 210)
+PlyLabel.Font = Enum.Font.GothamMedium
+PlyLabel.TextSize = 12
+PlyLabel.TextXAlignment = Enum.TextXAlignment.Left
+PlyLabel.Parent = TeleportPage
+
+local PlyDropBtn = Instance.new("TextButton")
+PlyDropBtn.Size = UDim2.new(0, 170, 0, 30)
+PlyDropBtn.Position = UDim2.new(0.5, -140, 0, 145)
+PlyDropBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+PlyDropBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+PlyDropBtn.Font = Enum.Font.GothamMedium
+PlyDropBtn.TextSize = 12
+PlyDropBtn.Text = "Pilih Pemain"
+PlyDropBtn.ZIndex = 2
+PlyDropBtn.Parent = TeleportPage
+local PlyDropCorner = Instance.new("UICorner") PlyDropCorner.CornerRadius = UDim.new(0, 6) PlyDropCorner.Parent = PlyDropBtn
+
+local PlyRefreshBtn = Instance.new("TextButton")
+PlyRefreshBtn.Size = UDim2.new(0, 100, 0, 30)
+PlyRefreshBtn.Position = UDim2.new(0.5, 40, 0, 145)
+PlyRefreshBtn.BackgroundColor3 = Color3.fromRGB(39, 201, 63)
+PlyRefreshBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+PlyRefreshBtn.Font = Enum.Font.GothamBold
+PlyRefreshBtn.TextSize = 12
+PlyRefreshBtn.Text = "REFRESH"
+PlyRefreshBtn.Parent = TeleportPage
+local PlyRefreshCorner = Instance.new("UICorner") PlyRefreshCorner.CornerRadius = UDim.new(0, 6) PlyRefreshCorner.Parent = PlyRefreshBtn
+
+local PlyTpBtn = Instance.new("TextButton")
+PlyTpBtn.Size = UDim2.new(0, 280, 0, 35)
+PlyTpBtn.Position = UDim2.new(0.5, -140, 0, 185)
+PlyTpBtn.BackgroundColor3 = Color3.fromRGB(180, 100, 70)
+PlyTpBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+PlyTpBtn.Font = Enum.Font.GothamBold
+PlyTpBtn.TextSize = 13
+PlyTpBtn.Text = "TELEPORT TO PLAYER"
+PlyTpBtn.Parent = TeleportPage
+local PlyTpCorner = Instance.new("UICorner") PlyTpCorner.CornerRadius = UDim.new(0, 8) PlyTpCorner.Parent = PlyTpBtn
+
+local PlyDropScroll = Instance.new("ScrollingFrame")
+PlyDropScroll.Size = UDim2.new(0, 170, 0, 100)
+PlyDropScroll.Position = UDim2.new(0.5, -140, 0, 180)
+PlyDropScroll.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+PlyDropScroll.BorderSizePixel = 0
+PlyDropScroll.CanvasSize = UDim2.new(0, 0, 0, 0)
+PlyDropScroll.AutomaticCanvasSize = Enum.AutomaticSize.Y
+PlyDropScroll.ScrollBarThickness = 4
+PlyDropScroll.Visible = false
+PlyDropScroll.ZIndex = 5
+PlyDropScroll.Parent = TeleportPage
+local PlyScrollCorner = Instance.new("UICorner") PlyScrollCorner.CornerRadius = UDim.new(0, 6) PlyScrollCorner.Parent = PlyDropScroll
+local PlyLayout = Instance.new("UIListLayout") PlyLayout.Parent = PlyDropScroll
+
+local ItemsPage = Instance.new("Frame")
+ItemsPage.Size = UDim2.new(1, 0, 1, 0)
+ItemsPage.BackgroundTransparency = 1
+ItemsPage.Visible = false
+ItemsPage.Parent = PageContainer
+
+local StoneStatusLabel = Instance.new("TextLabel")
+StoneStatusLabel.Size = UDim2.new(0, 300, 0, 40)
+StoneStatusLabel.Position = UDim2.new(0.5, -150, 0, 5)
+StoneStatusLabel.BackgroundTransparency = 1
+StoneStatusLabel.Text = "Auto Stone: OFF"
+StoneStatusLabel.TextColor3 = Color3.fromRGB(210, 210, 210)
+StoneStatusLabel.Font = Enum.Font.Gotham
+StoneStatusLabel.TextSize = 12
+StoneStatusLabel.TextWrapped = true
+StoneStatusLabel.Parent = ItemsPage
+
+local StoneAmtLabel = Instance.new("TextLabel")
+StoneAmtLabel.Size = UDim2.new(0, 150, 0, 20)
+StoneAmtLabel.Position = UDim2.new(0.5, -75, 0, 50)
+StoneAmtLabel.BackgroundTransparency = 1
+StoneAmtLabel.Text = "Jumlah Masing2 Batu:"
+StoneAmtLabel.TextColor3 = Color3.fromRGB(210, 210, 210)
+StoneAmtLabel.Font = Enum.Font.Gotham
+StoneAmtLabel.TextSize = 12
+StoneAmtLabel.Parent = ItemsPage
+
+local StoneAmtInput = Instance.new("TextBox")
+StoneAmtInput.Size = UDim2.new(0, 100, 0, 25)
+StoneAmtInput.Position = UDim2.new(0.5, -50, 0, 70)
+StoneAmtInput.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+StoneAmtInput.TextColor3 = Color3.fromRGB(255, 255, 255)
+StoneAmtInput.Font = Enum.Font.GothamMedium
+StoneAmtInput.TextSize = 12
+StoneAmtInput.Text = "1"
+StoneAmtInput.Parent = ItemsPage
+local IAC3 = Instance.new("UICorner") IAC3.CornerRadius = UDim.new(0, 6) IAC3.Parent = StoneAmtInput
+local IAS3 = Instance.new("UIStroke") IAS3.Color = Color3.fromRGB(70, 70, 70) IAS3.Thickness = 1 IAS3.Parent = StoneAmtInput
+
+local StoneDelayLabel = Instance.new("TextLabel")
+StoneDelayLabel.Size = UDim2.new(0, 150, 0, 20)
+StoneDelayLabel.Position = UDim2.new(0.5, -75, 0, 105)
+StoneDelayLabel.BackgroundTransparency = 1
+StoneDelayLabel.Text = "Jeda (Detik):"
+StoneDelayLabel.TextColor3 = Color3.fromRGB(210, 210, 210)
+StoneDelayLabel.Font = Enum.Font.Gotham
+StoneDelayLabel.TextSize = 12
+StoneDelayLabel.Parent = ItemsPage
+
+local StoneDelayInput = Instance.new("TextBox")
+StoneDelayInput.Size = UDim2.new(0, 100, 0, 25)
+StoneDelayInput.Position = UDim2.new(0.5, -50, 0, 125)
+StoneDelayInput.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+StoneDelayInput.TextColor3 = Color3.fromRGB(255, 255, 255)
+StoneDelayInput.Font = Enum.Font.GothamMedium
+StoneDelayInput.TextSize = 12
+StoneDelayInput.Text = "300"
+StoneDelayInput.Parent = ItemsPage
+local IAC4 = Instance.new("UICorner") IAC4.CornerRadius = UDim.new(0, 6) IAC4.Parent = StoneDelayInput
+local IAS4 = Instance.new("UIStroke") IAS4.Color = Color3.fromRGB(70, 70, 70) IAS4.Thickness = 1 IAS4.Parent = StoneDelayInput
+local ToggleStoneBtn = Instance.new("TextButton")
+ToggleStoneBtn.Size = UDim2.new(0, 220, 0, 35)
+ToggleStoneBtn.Position = UDim2.new(0.5, -110, 0, 170)
+ToggleStoneBtn.BackgroundColor3 = Color3.fromRGB(48, 209, 88)
+ToggleStoneBtn.Text = "START AUTO STONE"
+ToggleStoneBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+ToggleStoneBtn.Font = Enum.Font.GothamBold
+ToggleStoneBtn.TextSize = 13
+ToggleStoneBtn.Parent = ItemsPage
+local TAC = Instance.new("UICorner") TAC.CornerRadius = UDim.new(0, 8) TAC.Parent = ToggleStoneBtn
+local sessionCaught = 0
+local locations = {
+    ["Pulau Bali"] = Vector3.new(1116.165, 999.722, 1447.841),
+    ["Gua Natuna"] = Vector3.new(2088.226, 1000.806, -102.910),
+    ["Pulau Kinyis"] = Vector3.new(43.662, 1003.354, -612.128),
+    ["Wilayah Mega"] = Vector3.new(-609.493, 1005.124, -1794.807),
+    ["Pulau Raja Ampat"] = Vector3.new(-1828.859, 1006.627, -1500.152),
+    ["Zona Wakatobi"] = Vector3.new(-1355.541, 1018.514, 1468.846),
+    ["Pulau Laut Dalam Banda"] = Vector3.new(-399.500, 1005.680, 221.139)
+}
+
+local selectedLocation, selectedPlayer = nil, nil
+
+for locName, vec in pairs(locations) do
+    local optBtn = Instance.new("TextButton")
+    optBtn.Size = UDim2.new(1, 0, 0, 25)
+    optBtn.BackgroundColor3 = Color3.fromRGB(55, 55, 55)
+    optBtn.BackgroundTransparency = 1
+    optBtn.TextColor3 = Color3.fromRGB(220, 220, 220)
+    optBtn.Font = Enum.Font.GothamMedium
+    optBtn.TextSize = 11
+    optBtn.Text = locName
+    optBtn.ZIndex = 6
+    optBtn.Parent = LocDropScroll
+    optBtn.MouseButton1Click:Connect(function()
+        LocDropBtn.Text = locName
+        selectedLocation = vec
+        LocDropScroll.Visible = false
+    end)
+end
+
+LocDropBtn.MouseButton1Click:Connect(function()
+    LocDropScroll.Visible = not LocDropScroll.Visible
+    PlyDropScroll.Visible = false
+    SellDropdownList.Visible = false
+end)
+
+local function populatePlayers()
+    for _, child in ipairs(PlyDropScroll:GetChildren()) do
+        if child:IsA("TextButton") then child:Destroy() end
+    end
+    for _, p in ipairs(Players:GetPlayers()) do
+        if p ~= Player then
+            local optBtn = Instance.new("TextButton")
+            optBtn.Size = UDim2.new(1, 0, 0, 25)
+            optBtn.BackgroundColor3 = Color3.fromRGB(55, 55, 55)
+            optBtn.BackgroundTransparency = 1
+            optBtn.TextColor3 = Color3.fromRGB(220, 220, 220)
+            optBtn.Font = Enum.Font.GothamMedium
+            optBtn.TextSize = 11
+            optBtn.Text = p.Name
+            optBtn.ZIndex = 6
+            optBtn.Parent = PlyDropScroll
+            optBtn.MouseButton1Click:Connect(function()
+                PlyDropBtn.Text = p.Name
+                selectedPlayer = p
+                PlyDropScroll.Visible = false
+            end)
+        end
+    end
+end
+
+PlyRefreshBtn.MouseButton1Click:Connect(function()
+    populatePlayers()
+    PlyDropBtn.Text = "Pilih Pemain"
+    selectedPlayer = nil
+end)
+
+PlyDropBtn.MouseButton1Click:Connect(function()
+    PlyDropScroll.Visible = not PlyDropScroll.Visible
+    LocDropScroll.Visible = false
+    SellDropdownList.Visible = false
+end)
+
+LocTpBtn.MouseButton1Click:Connect(function()
+    if selectedLocation and Player.Character and Player.Character:FindFirstChild("HumanoidRootPart") then
+        Player.Character.HumanoidRootPart.CFrame = CFrame.new(selectedLocation)
+    end
+end)
+
+PlyTpBtn.MouseButton1Click:Connect(function()
+    if selectedPlayer and selectedPlayer.Character and selectedPlayer.Character:FindFirstChild("HumanoidRootPart") then
+        if Player.Character and Player.Character:FindFirstChild("HumanoidRootPart") then
+            Player.Character.HumanoidRootPart.CFrame = selectedPlayer.Character.HumanoidRootPart.CFrame * CFrame.new(0, 3, 0)
+        end
+    end
+end)
+
+SellDropdownBtn.MouseButton1Click:Connect(function()
+    SellDropdownList.Visible = not SellDropdownList.Visible
+    LocDropScroll.Visible = false
+    PlyDropScroll.Visible = false
+end)
+
+local dragging, dragInput, dragStart, startPos
+TopBar.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = true
+        dragStart = input.Position
+        startPos = MainFrame.Position
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then dragging = false end
+        end)
+    end
+end)
+
+TopBar.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+        dragInput = input
+    end
+end)
+
+RunService.RenderStepped:Connect(function()
+    if dragging and dragInput then
+        local delta = dragInput.Position - dragStart
+        MainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+end)
+
+CloseBtn.MouseButton1Click:Connect(function()
+    ScreenGui:Destroy()
+end)
+
+local isMinimized = false
+MinBtn.MouseButton1Click:Connect(function()
+    isMinimized = not isMinimized
+    if isMinimized then
+        MainFrame.Size = UDim2.new(0, 350, 0, 28)
+        TabBar.Visible = false
+        PageContainer.Visible = false
+        SellDropdownList.Visible = false
+        LocDropScroll.Visible = false
+        PlyDropScroll.Visible = false
+        MainStroke.Enabled = false
+    else
+        MainFrame.Size = UDim2.new(0, 350, 0, 380)
+        TabBar.Visible = true
+        PageContainer.Visible = true
+        MainStroke.Enabled = true
+    end
+end)
+
+local function updateTabs(active)
+    local btns = {Info = InfoTabBtn, Fishing = FishingTabBtn, Sell = SellTabBtn, Teleport = TeleportTabBtn, Items = ItemsTabBtn}
+    for name, btn in pairs(btns) do
+        btn.BackgroundColor3 = active == name and Color3.fromRGB(60, 60, 60) or Color3.fromRGB(42, 42, 42)
+        btn.TextColor3 = active == name and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(160, 160, 160)
+        btn.Font = active == name and Enum.Font.GothamBold or Enum.Font.GothamMedium
+    end
+    InfoPage.Visible = active == "Info"
+    FishingPage.Visible = active == "Fishing"
+    SellPage.Visible = active == "Sell"
+    TeleportPage.Visible = active == "Teleport"
+    ItemsPage.Visible = active == "Items"
+    SellDropdownList.Visible = false
+    LocDropScroll.Visible = false
+    PlyDropScroll.Visible = false
+end
+
+InfoTabBtn.MouseButton1Click:Connect(function() updateTabs("Info") end)
+FishingTabBtn.MouseButton1Click:Connect(function() updateTabs("Fishing") end)
+SellTabBtn.MouseButton1Click:Connect(function() updateTabs("Sell") end)
+TeleportTabBtn.MouseButton1Click:Connect(function() updateTabs("Teleport") end)
+ItemsTabBtn.MouseButton1Click:Connect(function() updateTabs("Items") end)
+
+local isAntiAFK = false
+Player.Idled:Connect(function()
+    if isAntiAFK then
+        VirtualUser:Button2Down(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
+        task.wait(1)
+        VirtualUser:Button2Up(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
+    end
+end)
+
+ToggleAntiAFKBtn.MouseButton1Click:Connect(function()
+    isAntiAFK = not isAntiAFK
+    if isAntiAFK then
+        ToggleAntiAFKBtn.Text = "ANTI AFK: ON"
+        ToggleAntiAFKBtn.BackgroundColor3 = Color3.fromRGB(10, 132, 255)
+    else
+        ToggleAntiAFKBtn.Text = "ANTI AFK: OFF"
+        ToggleAntiAFKBtn.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+    end
+end)
+
+local isSkywalk = false
+local skywalkPart = Instance.new("Part")
+skywalkPart.Size = Vector3.new(10, 1, 10)
+skywalkPart.Transparency = 1
+skywalkPart.Anchored = true
+skywalkPart.CanCollide = true
+skywalkPart.Parent = workspace
+
+RunService.RenderStepped:Connect(function()
+    if isSkywalk and Player.Character and Player.Character:FindFirstChild("HumanoidRootPart") then
+        skywalkPart.CFrame = Player.Character.HumanoidRootPart.CFrame * CFrame.new(0, -3.5, 0)
+    else
+        skywalkPart.CFrame = CFrame.new(0, 999999, 0)
+    end
+end)
+
+ToggleSkywalkBtn.MouseButton1Click:Connect(function()
+    isSkywalk = not isSkywalk
+    if isSkywalk then
+        ToggleSkywalkBtn.Text = "SKYWALK: ON"
+        ToggleSkywalkBtn.BackgroundColor3 = Color3.fromRGB(10, 132, 255)
+    else
+        ToggleSkywalkBtn.Text = "SKYWALK: OFF"
+        ToggleSkywalkBtn.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+    end
+end)
+
+-- Dynamic Tool ID Fetcher
+local function getDynamicToolId()
+    local userIdStr = tostring(Player.UserId)
+    for _, child in ipairs(ReplicatedStorage:GetChildren()) do
+        local match = string.match(child.Name, "FishingRod_" .. userIdStr .. "_(.-)_ThrowState")
+        if match then return match end
+    end
+    return nil
+end
+
+local isInstant = false
+local isAutoSelling = false
+local isAutoStone = false
+
+local function performFishingLoop()
+    local throwEvent = ReplicatedStorage:FindFirstChild("Fishing_RemoteThrow")
+    local fishingFolder = ReplicatedStorage:FindFirstChild("Fishing")
+    
+    local reelRemote = nil
+    local cancelRemote = nil
+    
+    if fishingFolder and fishingFolder:FindFirstChild("ToServer") then
+        reelRemote = fishingFolder.ToServer:FindFirstChild("ReelFinished")
+        cancelRemote = fishingFolder.ToServer:FindFirstChild("CancelPendingBite")
+    end
+
+    while isInstant do
+        local currentToolId = getDynamicToolId()
+
+        if not currentToolId then
+            StatusLabel.Text = "Standby: Please equip your rod..."
+            StatusLabel.TextColor3 = Color3.fromRGB(255, 159, 10)
+            task.wait(1)
+            continue
+        end
+
+        StatusLabel.Text = "Mode: INSTANT | ID: " .. string.sub(currentToolId, 1, 10) .. "..."
+        StatusLabel.TextColor3 = Color3.fromRGB(48, 209, 88)
+
+        local multiCount = tonumber(MultiInput.Text) or 10
+        local delayTime = tonumber(DelayInput.Text) or 4
+
+        for i = 1, multiCount do
+            if not isInstant then break end
+            
+            -- FIX: Berurutan, tidak di-spawn bersamaan agar server tidak nge-bug
+            if throwEvent then
+                throwEvent:FireServer(0.93745006500285, currentToolId)
+            end
+            
+            task.wait(delayTime)
+            
+            if reelRemote then
+                reelRemote:FireServer({
+                    duration = 2.7480297389993,
+                    result = "SUCCESS",
+                    insideRatio = 0.8
+                }, currentToolId)
+            end
+            
+            if cancelRemote then
+                cancelRemote:FireServer(currentToolId)
+            end
+            
+            sessionCaught = sessionCaught + 1
+            CaughtLabel.Text = "Session Caught: " .. tostring(sessionCaught)
+            
+            -- Jeda kecil antar lemparan agar rate limit aman
+            task.wait(0.2) 
+        end
+        
+        task.wait(0.5)
+    end
+end
+
+local function performAutoSell()
+    while isAutoSelling do
+        local sellDelay = tonumber(SellDelayInput.Text) or 10
+        local sellUnderVal = tonumber(SellDropdownBtn.Text) or 1000
+        
+        local econFolder = ReplicatedStorage:FindFirstChild("Economy")
+        if econFolder and econFolder:FindFirstChild("ToServer") and econFolder.ToServer:FindFirstChild("SellUnder") then
+            econFolder.ToServer.SellUnder:FireServer(sellUnderVal)
+            SellStatusLabel.Text = "Status: Selling items under " .. sellUnderVal
+            SellStatusLabel.TextColor3 = Color3.fromRGB(48, 209, 88)
+        else
+            SellStatusLabel.Text = "Status: Remote 'SellUnder' not found!"
+            SellStatusLabel.TextColor3 = Color3.fromRGB(255, 95, 86)
+        end
+        task.wait(sellDelay)
+    end
+end
+
+local function performAutoStone()
+    local luckyFolder = ReplicatedStorage:FindFirstChild("LuckyStone")
+    local activateRemote = nil
+    if luckyFolder and luckyFolder:FindFirstChild("ToServer") then
+        activateRemote = luckyFolder.ToServer:FindFirstChild("ActivateStone")
+    end
+
+    local stoneTypes = {"GREEN_STONE", "YELLOW_STONE", "BLACK_STONE"}
+
+    while isAutoStone do
+        if activateRemote then
+            local currentToolId = getDynamicToolId()
+            if currentToolId then
+                local amount = tonumber(StoneAmtInput.Text) or 1
+                for _, sType in ipairs(stoneTypes) do
+                    for i = 1, amount do
+                        activateRemote:FireServer(currentToolId, sType)
+                        task.wait(0.2)
+                    end
+                end
+                StoneStatusLabel.Text = "Auto Stone: Active ("..amount.." Each)"
+                StoneStatusLabel.TextColor3 = Color3.fromRGB(48, 209, 88)
+            else
+                StoneStatusLabel.Text = "Auto Stone: Please equip rod!"
+                StoneStatusLabel.TextColor3 = Color3.fromRGB(255, 159, 10)
+            end
+        else
+            StoneStatusLabel.Text = "Auto Stone: Remote not found!"
+            StoneStatusLabel.TextColor3 = Color3.fromRGB(255, 95, 86)
+        end
+        local delayTime = tonumber(StoneDelayInput.Text) or 300
+        task.wait(delayTime)
+    end
+end
+
+ToggleInstantBtn.MouseButton1Click:Connect(function()
+    isInstant = not isInstant
+    if isInstant then
+        ToggleInstantBtn.Text = "STOP INSTANT FISHING"
+        ToggleInstantBtn.BackgroundColor3 = Color3.fromRGB(255, 95, 86)
+        task.spawn(performFishingLoop)
+    else
+        ToggleInstantBtn.Text = "START INSTANT FISHING"
+        ToggleInstantBtn.BackgroundColor3 = Color3.fromRGB(10, 132, 255)
+        StatusLabel.Text = "Status: Waiting..."
+        StatusLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
+        
+        local currentToolId = getDynamicToolId()
+        if currentToolId then
+            local fishingFolder = ReplicatedStorage:FindFirstChild("Fishing")
+            if fishingFolder and fishingFolder:FindFirstChild("ToServer") and fishingFolder.ToServer:FindFirstChild("CancelPendingBite") then
+                fishingFolder.ToServer.CancelPendingBite:FireServer(currentToolId)
+            end
+        end
+    end
+end)
+
+ToggleSellBtn.MouseButton1Click:Connect(function()
+    isAutoSelling = not isAutoSelling
+    if isAutoSelling then
+        ToggleSellBtn.Text = "STOP AUTO SELL"
+        ToggleSellBtn.BackgroundColor3 = Color3.fromRGB(255, 95, 86)
+        task.spawn(performAutoSell)
+    else
+        ToggleSellBtn.Text = "START AUTO SELL"
+        ToggleSellBtn.BackgroundColor3 = Color3.fromRGB(48, 209, 88)
+        SellStatusLabel.Text = "Auto Sell: OFF"
+        SellStatusLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
+    end
+end)
+
+ToggleStoneBtn.MouseButton1Click:Connect(function()
+    isAutoStone = not isAutoStone
+    if isAutoStone then
+        ToggleStoneBtn.Text = "STOP AUTO STONE"
+        ToggleStoneBtn.BackgroundColor3 = Color3.fromRGB(255, 95, 86)
+        task.spawn(performAutoStone)
+    else
+        ToggleStoneBtn.Text = "START AUTO STONE"
+        ToggleStoneBtn.BackgroundColor3 = Color3.fromRGB(48, 209, 88)
+        StoneStatusLabel.Text = "Auto Stone: OFF"
+        StoneStatusLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
+    end
+end)
+
+GuiService.ErrorMessageChanged:Connect(function()
+    task.wait(2)
+    TeleportService:TeleportToPlaceInstance(game.PlaceId, game.JobId, Player)
+end)
+
+CoreGui.RobloxPromptGui.promptOverlay.ChildAdded:Connect(function(child)
+    if child.Name == 'ErrorPrompt' then
+        task.wait(2)
+        TeleportService:TeleportToPlaceInstance(game.PlaceId, game.JobId, Player)
+    end
+end)
+
