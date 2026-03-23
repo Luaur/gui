@@ -1,0 +1,237 @@
+local a = cloneref and cloneref(game:GetService("Players")) or game:GetService("Players")
+local b = cloneref and cloneref(game:GetService("RunService")) or game:GetService("RunService")
+local c = cloneref and cloneref(game:GetService("UserInputService")) or game:GetService("UserInputService")
+local d = cloneref and cloneref(game:GetService("CoreGui")) or game:GetService("CoreGui")
+
+local e = a.LocalPlayer
+
+local function f(g)
+    local h = ""
+    for i = 1, g do h = h .. string.char(math.random(97, 122)) end
+    return h
+end
+
+local i = Instance.new("ScreenGui")
+i.Name = f(15)
+i.ResetOnSpawn = false
+
+local K = Instance.new("Part")
+K.Name = f(15)
+K.Size = Vector3.new(6, 1, 6)
+K.Transparency = 1
+K.Anchored = true
+K.CanCollide = true
+
+local oldNamecall
+oldNamecall = hookmetamethod(game, "__namecall", newcclosure(function(self, ...)
+    local method = getnamecallmethod()
+    local args = {...}
+    
+    if not checkcaller() then
+        if method == "FindFirstChild" or method == "WaitForChild" or method == "FindFirstChildOfClass" or method == "FindFirstChildWhichIsA" then
+            if args[1] == i.Name or args[1] == "KemplongXD Hub" or args[1] == K.Name then
+                return nil
+            end
+        elseif method == "GetChildren" or method == "GetDescendants" then
+            local result = oldNamecall(self, ...)
+            local fakeResult = {}
+            for _, v in ipairs(result) do
+                if v ~= i and v ~= K then
+                    table.insert(fakeResult, v)
+                end
+            end
+            return fakeResult
+        end
+    end
+    
+    return oldNamecall(self, ...)
+end))
+
+local oldIndex
+oldIndex = hookmetamethod(game, "__index", newcclosure(function(self, key)
+    if not checkcaller() then
+        if self == i or self == K then
+            return nil
+        end
+    end
+    return oldIndex(self, key)
+end))
+
+local j, k = pcall(function()
+    if gethui then
+        i.Parent = gethui()
+    elseif syn and syn.protect_gui then
+        syn.protect_gui(i)
+        i.Parent = d
+    else
+        i.Parent = d
+    end
+end)
+
+if not j then i.Parent = e:WaitForChild("PlayerGui") end
+
+local l = Instance.new("Frame")
+l.Name = f(10)
+l.Size = UDim2.new(0, 220, 0, 250)
+l.Position = UDim2.new(0.5, -110, 0.5, -125)
+l.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+l.BorderSizePixel = 0
+l.Active = true
+l.Parent = i
+
+local m = Instance.new("Frame")
+m.Name = f(10)
+m.Size = UDim2.new(1, 0, 0, 35)
+m.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+m.BorderSizePixel = 0
+m.Parent = l
+
+local n = Instance.new("TextLabel")
+n.Name = f(10)
+n.Size = UDim2.new(1, -70, 1, 0)
+n.BackgroundTransparency = 1
+n.Text = "  KemplongXD Hub"
+n.Font = Enum.Font.GothamBold
+n.TextSize = 14
+n.TextColor3 = Color3.fromRGB(255, 255, 255)
+n.TextXAlignment = Enum.TextXAlignment.Left
+n.Parent = m
+
+local o = Instance.new("TextButton")
+o.Name = f(10)
+o.Size = UDim2.new(0, 35, 1, 0)
+o.Position = UDim2.new(1, -70, 0, 0)
+o.Text = "-"
+o.Font = Enum.Font.GothamBold
+o.TextSize = 18
+o.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+o.TextColor3 = Color3.fromRGB(255, 255, 255)
+o.BorderSizePixel = 0
+o.Parent = m
+
+local p = Instance.new("TextButton")
+p.Name = f(10)
+p.Size = UDim2.new(0, 35, 1, 0)
+p.Position = UDim2.new(1, -35, 0, 0)
+p.Text = "X"
+p.Font = Enum.Font.GothamBold
+p.TextSize = 14
+p.BackgroundColor3 = Color3.fromRGB(180, 40, 40)
+p.TextColor3 = Color3.fromRGB(255, 255, 255)
+p.BorderSizePixel = 0
+p.Parent = m
+
+local q = Instance.new("Frame")
+q.Name = f(10)
+q.Size = UDim2.new(1, 0, 1, -35)
+q.Position = UDim2.new(0, 0, 0, 35)
+q.BackgroundTransparency = 1
+q.Parent = l
+
+local r, s, t, u
+local function v(w)
+    local x = w.Position - t
+    l.Position = UDim2.new(u.X.Scale, u.X.Offset + x.X, u.Y.Scale, u.Y.Offset + x.Y)
+end
+
+m.InputBegan:Connect(function(w)
+    if w.UserInputType == Enum.UserInputType.MouseButton1 or w.UserInputType == Enum.UserInputType.Touch then
+        r = true; t = w.Position; u = l.Position
+        w.Changed:Connect(function() if w.UserInputState == Enum.UserInputState.End then r = false end end)
+    end
+end)
+
+m.InputChanged:Connect(function(w)
+    if w.UserInputType == Enum.UserInputType.MouseMovement or w.UserInputType == Enum.UserInputType.Touch then s = w end
+end)
+
+c.InputChanged:Connect(function(w)
+    if w == s and r then v(w) end
+end)
+
+local y = false
+o.MouseButton1Click:Connect(function()
+    y = not y
+    q.Visible = not y
+    l.Size = y and UDim2.new(0, 220, 0, 35) or UDim2.new(0, 220, 0, 250)
+end)
+
+p.MouseButton1Click:Connect(function()
+    i:Destroy()
+end)
+
+local function z(A, B)
+    local C = Instance.new("TextButton")
+    C.Name = f(10)
+    C.Size = UDim2.new(0.9, 0, 0, 40)
+    C.Position = UDim2.new(0.05, 0, 0, B)
+    C.Text = A .. " [OFF]"
+    C.Font = Enum.Font.GothamSemibold
+    C.TextSize = 13
+    C.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    C.TextColor3 = Color3.fromRGB(255, 255, 255)
+    C.BorderSizePixel = 0
+    C.Parent = q
+    
+    local D = Instance.new("UICorner")
+    D.CornerRadius = UDim.new(0, 5)
+    D.Parent = C
+    return C
+end
+
+local E = z("Skywalk", 15)
+local F = z("Lock Position", 65)
+local G = z("Walk on Water", 115)
+
+local H = { Skywalk = false, LockPosition = false, WalkOnWater = false }
+
+local function I(C, J, A)
+    if J then
+        C.Text = A .. " [ON]"
+        C.BackgroundColor3 = Color3.fromRGB(35, 140, 70)
+    else
+        C.Text = A .. " [OFF]"
+        C.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    end
+end
+
+E.MouseButton1Click:Connect(function()
+    H.Skywalk = not H.Skywalk
+    I(E, H.Skywalk, "Skywalk")
+    if not H.Skywalk and not H.WalkOnWater then K.Parent = nil end
+end)
+
+F.MouseButton1Click:Connect(function()
+    H.LockPosition = not H.LockPosition
+    I(F, H.LockPosition, "Lock Position")
+    local L = e.Character
+    if L and L:FindFirstChild("HumanoidRootPart") then
+        L.HumanoidRootPart.Anchored = H.LockPosition
+    end
+end)
+
+G.MouseButton1Click:Connect(function()
+    H.WalkOnWater = not H.WalkOnWater
+    I(G, H.WalkOnWater, "Walk on Water")
+    if not H.WalkOnWater and not H.Skywalk then K.Parent = nil end
+end)
+
+b.RenderStepped:Connect(function()
+    local L = e.Character
+    if not L or not L:FindFirstChild("HumanoidRootPart") or not L:FindFirstChild("Humanoid") then return end
+    
+    local M = L.HumanoidRootPart
+    local N = L.Humanoid
+    
+    if H.Skywalk then
+        K.Parent = workspace.Terrain
+        K.CFrame = M.CFrame * CFrame.new(0, -3.5, 0)
+    elseif H.WalkOnWater then
+        if N.FloorMaterial == Enum.Material.Water then
+            K.Parent = workspace.Terrain
+            K.CFrame = CFrame.new(M.Position.X, M.Position.Y - 3, M.Position.Z)
+        else
+            K.Parent = nil
+        end
+    end
+end)
