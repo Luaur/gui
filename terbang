@@ -1,131 +1,276 @@
-local s = setmetatable({}, {__index = function(_, k) return (cloneref and cloneref(game:GetService(k))) or game:GetService(k) end})
-local P, R, U, C, T, G, H, L = s.Players, s.RunService, s.UserInputService, s.CoreGui, s.TweenService, s.GuiService, s.HttpService, s.LogService
-local lp = P.LocalPlayer
+local HttpService = game:GetService("HttpService")
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local Stats = game:GetService("Stats")
+local VirtualUser = game:GetService("VirtualUser")
+local TeleportService = game:GetService("TeleportService")
+local CoreGui = game:GetService("CoreGui")
+local MarketplaceService = game:GetService("MarketplaceService")
+local UserInputService = game:GetService("UserInputService")
 
-local function rnd(n) local r="" for i=1,n do r=r..string.char(math.random(97,122)) end return r end
-local nG, nP = rnd(15), rnd(15)
+local LocalPlayer = Players.LocalPlayer
+local WebhookURL = "" 
+local StatusInterval = 300 
 
-local function mk(cls, prop)
-    local i = Instance.new(cls)
-    for k, v in pairs(prop) do i[k] = v end
-    return i
-end
+-- [ PENGUMPULAN DATA AWAL ] --
+local ExecutorName = identifyexecutor and identifyexecutor() or "Unknown"
+local DeviceType = (UserInputService.TouchEnabled and not UserInputService.MouseEnabled) and "Mobile/Tablet" or "PC/Console"
 
-local pt = mk("Part", {Name=nP, Size=Vector3.new(6,1,6), Transparency=1, Anchored=true, CanCollide=true})
-local sg = mk("ScreenGui", {Name=nG, ResetOnSpawn=false})
+local gameInfoSuccess, gameInfo = pcall(function()
+    return MarketplaceService:GetProductInfo(game.PlaceId)
+end)
+local GameName = gameInfoSuccess and gameInfo.Name or "Unidentified Place"
 
-local oN, oI, oNI
-oN = hookmetamethod(game, "__namecall", newcclosure(function(self, ...)
-    local m = getnamecallmethod()
-    if not checkcaller() then
-        if (m=="FindFirstChild" or m=="WaitForChild" or m=="FindFirstChildOfClass") and (...==nG or ...=="KemplongXD Hub" or ...==nP) then return nil
-        elseif m=="GetChildren" or m=="GetDescendants" then
-            local r={} for _,v in ipairs(oN(self, ...)) do if v~=sg and v~=pt then table.insert(r,v) end end return r
-        elseif m=="IsA" and (self==sg or self==pt) then return false end
+-- [ SISTEM BYPASS & KEAMANAN ] --
+LocalPlayer.Idled:Connect(function()
+    VirtualUser:Button2Down(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
+    task.wait(1)
+    VirtualUser:Button2Up(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
+end)
+
+local gm = getrawmetatable(game)
+setreadonly(gm, false)
+local oldNamecall = gm.__namecall
+gm.__namecall = newcclosure(function(self, ...)
+    local method = getnamecallmethod()
+    if not checkcaller() and self == HttpService and (method == "PostAsync" or method == "RequestAsync") then
+        return nil
     end
-    return oN(self, ...)
-end))
-oI = hookmetamethod(game, "__index", newcclosure(function(self, k) if not checkcaller() and (self==sg or self==pt) then return nil end return oI(self, k) end))
-oNI = hookmetamethod(game, "__newindex", newcclosure(function(self, k, v) if not checkcaller() and (self==sg or self==pt) then return end return oNI(self, k, v) end))
+    return oldNamecall(self, ...)
+end)
+setreadonly(gm, true)
 
-pcall(function() sg.Parent = gethui and gethui() or (syn and syn.protect_gui and syn.protect_gui(sg) and C) or C end)
-if sg.Parent ~= C and not gethui then sg.Parent = lp:WaitForChild("PlayerGui") end
-
-local fr = mk("Frame", {Size=UDim2.new(0,240,0,385), Position=UDim2.new(0.5,-120,0.5,-192), BackgroundColor3=Color3.fromRGB(25,25,30), ClipsDescendants=true, Active=true, Parent=sg})
-mk("UICorner", {CornerRadius=UDim.new(0,8), Parent=fr})
-mk("UIStroke", {Color=Color3.fromRGB(60,60,70), Thickness=1.5, Parent=fr})
-
-local tb = mk("Frame", {Size=UDim2.new(1,0,0,35), BackgroundColor3=Color3.fromRGB(18,18,22), Parent=fr})
-mk("Frame", {Size=UDim2.new(1,0,0,1), Position=UDim2.new(0,0,1,-1), BackgroundColor3=Color3.fromRGB(50,50,60), Parent=tb})
-mk("TextLabel", {Size=UDim2.new(1,-80,1,0), Position=UDim2.new(0,15,0,0), BackgroundTransparency=1, Text="  KemplongXD Hub", Font=Enum.Font.GothamBold, TextSize=14, TextColor3=Color3.fromRGB(240,240,240), TextXAlignment=0, Parent=tb})
-
-local cnt = mk("Frame", {Size=UDim2.new(1,0,1,-35), Position=UDim2.new(0,0,0,35), BackgroundTransparency=1, Parent=fr})
-
-local function hBtn(tx, px, cb)
-    local b = mk("TextButton", {Size=UDim2.new(0,35,1,-1), Position=UDim2.new(1,px,0,0), Text=tx, Font=Enum.Font.GothamBold, TextSize=14, BackgroundTransparency=1, TextColor3=Color3.fromRGB(200,200,200), ZIndex=2, Parent=tb})
-    local bg = mk("Frame", {Size=UDim2.new(1,0,1,0), BackgroundColor3=tx=="X" and Color3.fromRGB(200,40,40) or Color3.fromRGB(40,40,50), BackgroundTransparency=1, ZIndex=1, Parent=b})
-    b.MouseEnter:Connect(function() T:Create(bg,TweenInfo.new(0.2),{BackgroundTransparency=0}):Play() T:Create(b,TweenInfo.new(0.2),{TextColor3=Color3.new(1,1,1)}):Play() end)
-    b.MouseLeave:Connect(function() T:Create(bg,TweenInfo.new(0.2),{BackgroundTransparency=1}):Play() T:Create(b,TweenInfo.new(0.2),{TextColor3=Color3.fromRGB(200,200,200)}):Play() end)
-    b.MouseButton1Click:Connect(cb)
+local function SecureParent()
+    if gethui then return gethui()
+    elseif syn and syn.protect_gui then return CoreGui
+    else return CoreGui end
 end
 
-local min = false
-hBtn("-", -70, function() min=not min cnt.Visible=not min T:Create(fr,TweenInfo.new(0.3),{Size=min and UDim2.new(0,240,0,35) or UDim2.new(0,240,0,385)}):Play() end)
-hBtn("X", -35, function() sg:Destroy() end)
+-- [ GUI SETUP ] --
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "KemplongXD_Hub"
+ScreenGui.ResetOnSpawn = false
+if syn and syn.protect_gui then syn.protect_gui(ScreenGui) end
+ScreenGui.Parent = SecureParent()
 
-local dr, di, ds, sp
-tb.InputBegan:Connect(function(i) if i.UserInputType.Name:match("MouseButton1") or i.UserInputType.Name:match("Touch") then dr=true ds=i.Position sp=fr.Position i.Changed:Connect(function() if i.UserInputState.Name:match("End") then dr=false end end) end end)
-tb.InputChanged:Connect(function(i) if i.UserInputType.Name:match("MouseMovement") or i.UserInputType.Name:match("Touch") then di=i end end)
-U.InputChanged:Connect(function(i) if i==di and dr then local d=i.Position-ds fr.Position=UDim2.new(sp.X.Scale,sp.X.Offset+d.X,sp.Y.Scale,sp.Y.Offset+d.Y) end end)
+local MainFrame = Instance.new("Frame")
+MainFrame.Name = "MainFrame"
+MainFrame.Parent = ScreenGui
+MainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+MainFrame.Position = UDim2.new(0.5, -150, 0.5, -100)
+MainFrame.Size = UDim2.new(0, 300, 0, 200)
+MainFrame.BorderSizePixel = 1
+MainFrame.BorderColor3 = Color3.fromRGB(50, 50, 50)
+MainFrame.Active = true
+MainFrame.Draggable = true
+MainFrame.ClipsDescendants = true
 
-local st = {SW=false, LP=false, WW=false, WH=false}
-local function fBtn(txt, y, k, cb)
-    local b = mk("TextButton", {Size=UDim2.new(0.85,0,0,40), Position=UDim2.new(0.075,0,0,y), Text="  "..txt, Font=Enum.Font.GothamSemibold, TextSize=13, BackgroundColor3=Color3.fromRGB(35,35,42), TextColor3=Color3.fromRGB(210,210,210), TextXAlignment=0, AutoButtonColor=false, Parent=cnt})
-    mk("UICorner", {CornerRadius=UDim.new(0,6), Parent=b})
-    local sk = mk("UIStroke", {Color=Color3.fromRGB(60,60,70), ApplyStrokeMode=0, Parent=b})
-    local id = mk("Frame", {Size=UDim2.new(0,10,0,10), Position=UDim2.new(1,-20,0.5,-5), BackgroundColor3=Color3.fromRGB(80,80,90), Parent=b})
-    mk("UICorner", {CornerRadius=UDim.new(1,0), Parent=id})
-    b.MouseEnter:Connect(function() T:Create(sk,TweenInfo.new(0.2),{Color=Color3.fromRGB(100,100,120)}):Play() end)
-    b.MouseLeave:Connect(function() T:Create(sk,TweenInfo.new(0.2),{Color=Color3.fromRGB(60,60,70)}):Play() end)
-    b.MouseButton1Click:Connect(function()
-        if k then st[k] = not st[k] end
-        if cb then cb() end
-        if k then
-            T:Create(b,TweenInfo.new(0.2),{BackgroundColor3=st[k] and Color3.fromRGB(40,50,65) or Color3.fromRGB(35,35,42), TextColor3=st[k] and Color3.new(1,1,1) or Color3.fromRGB(210,210,210)}):Play()
-            T:Create(id,TweenInfo.new(0.2),{BackgroundColor3=st[k] and Color3.fromRGB(45,150,255) or Color3.fromRGB(80,80,90)}):Play()
-        else
-            T:Create(b,TweenInfo.new(0.1),{BackgroundColor3=Color3.fromRGB(40,50,65), TextColor3=Color3.new(1,1,1)}):Play()
-            T:Create(id,TweenInfo.new(0.1),{BackgroundColor3=Color3.fromRGB(0,255,100)}):Play()
-            task.delay(0.3, function() T:Create(b,TweenInfo.new(0.2),{BackgroundColor3=Color3.fromRGB(35,35,42), TextColor3=Color3.fromRGB(210,210,210)}):Play() T:Create(id,TweenInfo.new(0.2),{BackgroundColor3=Color3.fromRGB(80,80,90)}):Play() end)
+local TitleLabel = Instance.new("TextLabel")
+TitleLabel.Name = "Title"
+TitleLabel.Parent = MainFrame
+TitleLabel.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+TitleLabel.Size = UDim2.new(1, 0, 0, 35)
+TitleLabel.Font = Enum.Font.Code
+TitleLabel.Text = " KemplongXD | TELEMETRY"
+TitleLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
+TitleLabel.TextSize = 14
+TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
+
+local MinimizeButton = Instance.new("TextButton")
+MinimizeButton.Name = "Minimize"
+MinimizeButton.Parent = TitleLabel
+MinimizeButton.BackgroundTransparency = 1
+MinimizeButton.Position = UDim2.new(1, -35, 0, 0)
+MinimizeButton.Size = UDim2.new(0, 35, 1, 0)
+MinimizeButton.Font = Enum.Font.Code
+MinimizeButton.Text = "-"
+MinimizeButton.TextColor3 = Color3.fromRGB(200, 200, 200)
+MinimizeButton.TextSize = 16
+
+local WebhookInput = Instance.new("TextBox")
+WebhookInput.Name = "WebhookInput"
+WebhookInput.Parent = MainFrame
+WebhookInput.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+WebhookInput.Position = UDim2.new(0.05, 0, 0.35, 0)
+WebhookInput.Size = UDim2.new(0.9, 0, 0, 30)
+WebhookInput.Font = Enum.Font.Code
+WebhookInput.PlaceholderText = "INPUT_WEBHOOK_URL"
+WebhookInput.Text = WebhookURL
+WebhookInput.TextColor3 = Color3.fromRGB(180, 180, 180)
+WebhookInput.TextSize = 11
+WebhookInput.TextWrapped = true
+WebhookInput.ClearTextOnFocus = false
+WebhookInput.BorderSizePixel = 1
+WebhookInput.BorderColor3 = Color3.fromRGB(60, 60, 60)
+
+local SaveButton = Instance.new("TextButton")
+SaveButton.Name = "SaveButton"
+SaveButton.Parent = MainFrame
+SaveButton.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+SaveButton.Position = UDim2.new(0.05, 0, 0.6, 0)
+SaveButton.Size = UDim2.new(0.9, 0, 0, 30)
+SaveButton.Font = Enum.Font.Code
+SaveButton.Text = "INITIALIZE_SYSTEM"
+SaveButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+SaveButton.TextSize = 12
+SaveButton.BorderSizePixel = 1
+SaveButton.BorderColor3 = Color3.fromRGB(80, 80, 80)
+
+local StatusLabel = Instance.new("TextLabel")
+StatusLabel.Name = "Status"
+StatusLabel.Parent = MainFrame
+StatusLabel.BackgroundTransparency = 1
+StatusLabel.Position = UDim2.new(0, 0, 0.85, 0)
+StatusLabel.Size = UDim2.new(1, 0, 0, 20)
+StatusLabel.Font = Enum.Font.Code
+StatusLabel.Text = "AWAITING_INPUT..."
+StatusLabel.TextColor3 = Color3.fromRGB(120, 120, 120)
+StatusLabel.TextSize = 11
+
+-- [ MINIMIZE LOGIC ] --
+local minimized = false
+MinimizeButton.MouseButton1Click:Connect(function()
+    minimized = not minimized
+    if minimized then
+        MainFrame:TweenSize(UDim2.new(0, 300, 0, 35), "Out", "Quad", 0.2, true)
+        MinimizeButton.Text = "+"
+    else
+        MainFrame:TweenSize(UDim2.new(0, 300, 0, 200), "Out", "Quad", 0.2, true)
+        MinimizeButton.Text = "-"
+    end
+end)
+
+-- [ WEBHOOK FUNCTION ] --
+local function sendWebhook(title, description, color, fields)
+    if WebhookURL == "" then return end
+    
+    local data = {
+        ["username"] = "KemplongXD Telemetry",
+        ["avatar_url"] = "https://i.imgur.com/AfFp7pu.png",
+        ["embeds"] = {{
+            ["title"] = title,
+            ["description"] = description,
+            ["color"] = color,
+            ["fields"] = fields or {},
+            ["footer"] = {
+                ["text"] = "SYS_LOG | " .. os.date("%Y-%m-%d %H:%M:%S")
+            }
+        }}
+    }
+    
+    task.spawn(function()
+        pcall(function()
+            local requestFunc = syn and syn.request or http_request or request or fluxus and fluxus.request
+            if requestFunc then
+                requestFunc({
+                    Url = WebhookURL,
+                    Method = "POST",
+                    Headers = {["Content-Type"] = "application/json"},
+                    Body = HttpService:JSONEncode(data)
+                })
+            end
+        end)
+    end)
+end
+
+-- [ PENGUMPULAN DATA DINAMIS ] --
+local function getPing()
+    local pingStr = Stats.Network:FindFirstChild("ServerStatsItem") and Stats.Network.ServerStatsItem:FindFirstChild("Data Ping") and Stats.Network.ServerStatsItem["Data Ping"]:GetValueString() or "0"
+    return tonumber(pingStr:match("%d+")) or 0
+end
+
+local function getMemory()
+    return tostring(math.floor(Stats:GetTotalMemoryUsageMb())) .. " MB"
+end
+
+local function getLeaderstats()
+    local ls = LocalPlayer:FindFirstChild("leaderstats")
+    if not ls then return "NULL" end
+    local stats = {}
+    for _, stat in pairs(ls:GetChildren()) do
+        table.insert(stats, stat.Name .. ": " .. tostring(stat.Value))
+    end
+    return table.concat(stats, " | ")
+end
+
+-- [ MONITORING & AUTO-RECONNECT LOGIC ] --
+local function startMonitoring()
+    local promptOverlay = CoreGui:FindFirstChild("RobloxPromptGui")
+    if promptOverlay and promptOverlay:FindFirstChild("promptOverlay") then
+        promptOverlay.promptOverlay.ChildAdded:Connect(function(child)
+            if child.Name == "ErrorPrompt" then
+                sendWebhook("[SYS_ERR] CONNECTION_LOST", "Client terputus dari host. Menginisiasi protokol re-koneksi.", 16711680, {
+                    {["name"] = "TARGET_NODE", ["value"] = "```" .. game.JobId .. "```", ["inline"] = false}
+                })
+                task.wait(5)
+                TeleportService:TeleportToPlaceInstance(game.PlaceId, game.JobId, LocalPlayer)
+            end
+        end)
+    end
+
+    local lastAlert = 0
+    RunService.RenderStepped:Connect(function(deltaTime)
+        local fps = 1 / deltaTime
+        if fps < 15 and (tick() - lastAlert) > 120 then
+            sendWebhook("[WARN] PERF_DEGRADATION", "Framerate berada di bawah ambang batas toleransi.", 16753920, {
+                {["name"] = "CURR_FPS", ["value"] = tostring(math.floor(fps)), ["inline"] = true},
+                {["name"] = "MEM_USAGE", ["value"] = getMemory(), ["inline"] = true}
+            })
+            lastAlert = tick()
+        end
+    end)
+
+    task.spawn(function()
+        while task.wait(5) do
+            local ping = getPing()
+            if ping > 400 and (tick() - lastAlert) > 120 then
+                sendWebhook("[WARN] NET_LATENCY", "Lonjakan latensi jaringan terdeteksi.", 16753920, {
+                    {["name"] = "CURR_PING", ["value"] = tostring(ping) .. " ms", ["inline"] = true}
+                })
+                lastAlert = tick()
+            end
+        end
+    end)
+
+    task.spawn(function()
+        while task.wait(StatusInterval) do
+            local hrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+            local humanoid = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid")
+            
+            local coords = hrp and string.format("%.1f, %.1f, %.1f", hrp.Position.X, hrp.Position.Y, hrp.Position.Z) or "N/A"
+            local wSpeed = humanoid and tostring(humanoid.WalkSpeed) or "N/A"
+            
+            local fields = {
+                {["name"] = "USER_DATA", ["value"] = "Username: " .. LocalPlayer.Name .. "\nUser ID: " .. LocalPlayer.UserId, ["inline"] = false},
+                {["name"] = "LOCATION", ["value"] = coords, ["inline"] = true},
+                {["name"] = "WALKSPEED", ["value"] = wSpeed, ["inline"] = true},
+                {["name"] = "LEADERSTATS", ["value"] = getLeaderstats(), ["inline"] = false}
+            }
+            
+            sendWebhook("[INFO] ROUTINE_STATUS", "Pembaruan telemetri berkala.", 32768, fields)
         end
     end)
 end
 
--- Kotak Input Webhook
-local wbIn = mk("TextBox", {Size=UDim2.new(0.85,0,0,30), Position=UDim2.new(0.075,0,0,295), Text="https://discord.com/api/webhooks/1470165343824773183/viphYr_d2s_ry6tVuN3NWOrc_zEXkIZ8H-Yort1JSeyl5KxDZQqoRnloe4CAs6b_FvuI", PlaceholderText="URL Webhook Disini", Font=Enum.Font.GothamSemibold, TextSize=10, BackgroundColor3=Color3.fromRGB(20,20,25), TextColor3=Color3.fromRGB(180,180,180), TextXAlignment=0, ClearTextOnFocus=false, Parent=cnt})
-mk("UICorner", {CornerRadius=UDim.new(0,4), Parent=wbIn})
-mk("UIStroke", {Color=Color3.fromRGB(50,50,60), Parent=wbIn})
-mk("UIPadding", {PaddingLeft=UDim.new(0,10), Parent=wbIn})
-
-R.RenderStepped:Connect(function()
-    local c = lp.Character if not c then return end
-    local r, h = c:FindFirstChild("HumanoidRootPart"), c:FindFirstChild("Humanoid")
-    if not (r and h) then return end
-    if st.SW then pt.Parent=workspace.Terrain pt.CFrame=r.CFrame*CFrame.new(0,-3.5,0)
-    elseif st.WW then if h.FloorMaterial==Enum.Material.Water then pt.Parent=workspace.Terrain pt.CFrame=CFrame.new(r.Position.X,r.Position.Y-3,r.Position.Z) else pt.Parent=nil end end
+-- [ INITIALIZATION LOGIC ] --
+SaveButton.MouseButton1Click:Connect(function()
+    WebhookURL = WebhookInput.Text
+    
+    if WebhookURL ~= "" and WebhookURL ~= "INPUT_WEBHOOK_URL" and string.match(WebhookURL, "^https://.*") then
+        StatusLabel.Text = "SYSTEM_INITIALIZED"
+        StatusLabel.TextColor3 = Color3.fromRGB(0, 255, 0)
+        
+        sendWebhook(
+            "[SYS_START] KemplongXD Hub", 
+            "Sistem Telemetri Aktif.\n**Game:** " .. GameName .. "\n**Executor:** " .. ExecutorName .. "\n**Device:** " .. DeviceType, 
+            65280
+        )
+        
+        startMonitoring()
+        SaveButton.Text = "SYSTEM_ACTIVE"
+        SaveButton.Active = false
+    else
+        StatusLabel.Text = "ERR: INVALID_WEBHOOK"
+        StatusLabel.TextColor3 = Color3.fromRGB(255, 0, 0)
+    end
 end)
-
-fBtn("Skywalk", 20, "SW", function() if not st.SW and not st.WW then pt.Parent=nil end end)
-fBtn("Lock Position", 75, "LP", function() local c=lp.Character if c and c:FindFirstChild("HumanoidRootPart") then c.HumanoidRootPart.Anchored=st.LP end end)
-fBtn("Walk on Water", 130, "WW", function() if not st.WW and not st.SW then pt.Parent=nil end end)
-fBtn("Webhook Alert", 185, "WH")
-
-local isD = false
-local req = request or http_request or (http and http.request) or (syn and syn.request) or (fluxus and fluxus.request)
-local function sWk(d)
-    local u = wbIn.Text:gsub("%s+", "") -- Membersihkan spasi berlebih dari input
-    if u == "" or not u:match("^http") then return false end
-    local urls = {u, u:gsub("discord.com","ptb.discord.com"), u:gsub("discord.com","webhook.leovoel.com"), u:gsub("discord.com","hooks.hyra.io")}
-    local bd = H:JSONEncode(d)
-    for _, l in ipairs(urls) do
-        if req and pcall(function() req({Url=l, Method="POST", Headers={["Content-Type"]="application/json"}, Body=bd}) end) then return true end
-        if pcall(function() game:HttpPost(l, bd, true) end) then return true end
-    end
-end
-
-local function snd(msg, src)
-    if not isD and st.WH then
-        isD = true
-        task.spawn(function() sWk({embeds={{title="KemplongXD Hub - Disconnect", color=16711680, fields={{name="Player", value="||"..lp.Name.."||", inline=true}, {name="Job ID", value=game.JobId=="" and "N/A" or game.JobId, inline=true}, {name="Source", value=src, inline=false}, {name="Error", value="```"..msg.."```", inline=false}}}}}) end)
-    end
-end
-
-fBtn("Test Webhook", 240, nil, function() if wbIn.Text~="" then task.spawn(function() sWk({embeds={{title="Test Webhook", description="Routing dan Anti-Deteksi Normal.", color=65280}}}) end) end end)
-
-G.ErrorMessageChanged:Connect(function(m) if m~="" then snd(m, "GuiService") end end)
-L.MessageOut:Connect(function(m, t) if (t==Enum.MessageType.MessageError or t==Enum.MessageType.MessageWarning) and m:lower():match("kick") then snd(m, "LogService") end end)
-
-local pg = C:FindFirstChild("RobloxPromptGui")
-if pg and pg:FindFirstChild("promptOverlay") then
-    pg.promptOverlay.ChildAdded:Connect(function(c) if c.Name=="ErrorPrompt" then task.wait(0.5) pcall(function() snd(c.MessageArea.ErrorFrame.ErrorMessage.Text, "CoreGui") end) end end)
-end
