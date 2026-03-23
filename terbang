@@ -1,237 +1,131 @@
-local a = cloneref and cloneref(game:GetService("Players")) or game:GetService("Players")
-local b = cloneref and cloneref(game:GetService("RunService")) or game:GetService("RunService")
-local c = cloneref and cloneref(game:GetService("UserInputService")) or game:GetService("UserInputService")
-local d = cloneref and cloneref(game:GetService("CoreGui")) or game:GetService("CoreGui")
+local s = setmetatable({}, {__index = function(_, k) return (cloneref and cloneref(game:GetService(k))) or game:GetService(k) end})
+local P, R, U, C, T, G, H, L = s.Players, s.RunService, s.UserInputService, s.CoreGui, s.TweenService, s.GuiService, s.HttpService, s.LogService
+local lp = P.LocalPlayer
 
-local e = a.LocalPlayer
+local function rnd(n) local r="" for i=1,n do r=r..string.char(math.random(97,122)) end return r end
+local nG, nP = rnd(15), rnd(15)
 
-local function f(g)
-    local h = ""
-    for i = 1, g do h = h .. string.char(math.random(97, 122)) end
-    return h
+local function mk(cls, prop)
+    local i = Instance.new(cls)
+    for k, v in pairs(prop) do i[k] = v end
+    return i
 end
 
-local i = Instance.new("ScreenGui")
-i.Name = f(15)
-i.ResetOnSpawn = false
+local pt = mk("Part", {Name=nP, Size=Vector3.new(6,1,6), Transparency=1, Anchored=true, CanCollide=true})
+local sg = mk("ScreenGui", {Name=nG, ResetOnSpawn=false})
 
-local K = Instance.new("Part")
-K.Name = f(15)
-K.Size = Vector3.new(6, 1, 6)
-K.Transparency = 1
-K.Anchored = true
-K.CanCollide = true
-
-local oldNamecall
-oldNamecall = hookmetamethod(game, "__namecall", newcclosure(function(self, ...)
-    local method = getnamecallmethod()
-    local args = {...}
-    
+local oN, oI, oNI
+oN = hookmetamethod(game, "__namecall", newcclosure(function(self, ...)
+    local m = getnamecallmethod()
     if not checkcaller() then
-        if method == "FindFirstChild" or method == "WaitForChild" or method == "FindFirstChildOfClass" or method == "FindFirstChildWhichIsA" then
-            if args[1] == i.Name or args[1] == "KemplongXD Hub" or args[1] == K.Name then
-                return nil
-            end
-        elseif method == "GetChildren" or method == "GetDescendants" then
-            local result = oldNamecall(self, ...)
-            local fakeResult = {}
-            for _, v in ipairs(result) do
-                if v ~= i and v ~= K then
-                    table.insert(fakeResult, v)
-                end
-            end
-            return fakeResult
-        end
+        if (m=="FindFirstChild" or m=="WaitForChild" or m=="FindFirstChildOfClass") and (...==nG or ...=="KemplongXD Hub" or ...==nP) then return nil
+        elseif m=="GetChildren" or m=="GetDescendants" then
+            local r={} for _,v in ipairs(oN(self, ...)) do if v~=sg and v~=pt then table.insert(r,v) end end return r
+        elseif m=="IsA" and (self==sg or self==pt) then return false end
     end
-    
-    return oldNamecall(self, ...)
+    return oN(self, ...)
 end))
+oI = hookmetamethod(game, "__index", newcclosure(function(self, k) if not checkcaller() and (self==sg or self==pt) then return nil end return oI(self, k) end))
+oNI = hookmetamethod(game, "__newindex", newcclosure(function(self, k, v) if not checkcaller() and (self==sg or self==pt) then return end return oNI(self, k, v) end))
 
-local oldIndex
-oldIndex = hookmetamethod(game, "__index", newcclosure(function(self, key)
-    if not checkcaller() then
-        if self == i or self == K then
-            return nil
-        end
-    end
-    return oldIndex(self, key)
-end))
+pcall(function() sg.Parent = gethui and gethui() or (syn and syn.protect_gui and syn.protect_gui(sg) and C) or C end)
+if sg.Parent ~= C and not gethui then sg.Parent = lp:WaitForChild("PlayerGui") end
 
-local j, k = pcall(function()
-    if gethui then
-        i.Parent = gethui()
-    elseif syn and syn.protect_gui then
-        syn.protect_gui(i)
-        i.Parent = d
-    else
-        i.Parent = d
-    end
-end)
+local fr = mk("Frame", {Size=UDim2.new(0,240,0,385), Position=UDim2.new(0.5,-120,0.5,-192), BackgroundColor3=Color3.fromRGB(25,25,30), ClipsDescendants=true, Active=true, Parent=sg})
+mk("UICorner", {CornerRadius=UDim.new(0,8), Parent=fr})
+mk("UIStroke", {Color=Color3.fromRGB(60,60,70), Thickness=1.5, Parent=fr})
 
-if not j then i.Parent = e:WaitForChild("PlayerGui") end
+local tb = mk("Frame", {Size=UDim2.new(1,0,0,35), BackgroundColor3=Color3.fromRGB(18,18,22), Parent=fr})
+mk("Frame", {Size=UDim2.new(1,0,0,1), Position=UDim2.new(0,0,1,-1), BackgroundColor3=Color3.fromRGB(50,50,60), Parent=tb})
+mk("TextLabel", {Size=UDim2.new(1,-80,1,0), Position=UDim2.new(0,15,0,0), BackgroundTransparency=1, Text="  KemplongXD Hub", Font=Enum.Font.GothamBold, TextSize=14, TextColor3=Color3.fromRGB(240,240,240), TextXAlignment=0, Parent=tb})
 
-local l = Instance.new("Frame")
-l.Name = f(10)
-l.Size = UDim2.new(0, 220, 0, 250)
-l.Position = UDim2.new(0.5, -110, 0.5, -125)
-l.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-l.BorderSizePixel = 0
-l.Active = true
-l.Parent = i
+local cnt = mk("Frame", {Size=UDim2.new(1,0,1,-35), Position=UDim2.new(0,0,0,35), BackgroundTransparency=1, Parent=fr})
 
-local m = Instance.new("Frame")
-m.Name = f(10)
-m.Size = UDim2.new(1, 0, 0, 35)
-m.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
-m.BorderSizePixel = 0
-m.Parent = l
-
-local n = Instance.new("TextLabel")
-n.Name = f(10)
-n.Size = UDim2.new(1, -70, 1, 0)
-n.BackgroundTransparency = 1
-n.Text = "  KemplongXD Hub"
-n.Font = Enum.Font.GothamBold
-n.TextSize = 14
-n.TextColor3 = Color3.fromRGB(255, 255, 255)
-n.TextXAlignment = Enum.TextXAlignment.Left
-n.Parent = m
-
-local o = Instance.new("TextButton")
-o.Name = f(10)
-o.Size = UDim2.new(0, 35, 1, 0)
-o.Position = UDim2.new(1, -70, 0, 0)
-o.Text = "-"
-o.Font = Enum.Font.GothamBold
-o.TextSize = 18
-o.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-o.TextColor3 = Color3.fromRGB(255, 255, 255)
-o.BorderSizePixel = 0
-o.Parent = m
-
-local p = Instance.new("TextButton")
-p.Name = f(10)
-p.Size = UDim2.new(0, 35, 1, 0)
-p.Position = UDim2.new(1, -35, 0, 0)
-p.Text = "X"
-p.Font = Enum.Font.GothamBold
-p.TextSize = 14
-p.BackgroundColor3 = Color3.fromRGB(180, 40, 40)
-p.TextColor3 = Color3.fromRGB(255, 255, 255)
-p.BorderSizePixel = 0
-p.Parent = m
-
-local q = Instance.new("Frame")
-q.Name = f(10)
-q.Size = UDim2.new(1, 0, 1, -35)
-q.Position = UDim2.new(0, 0, 0, 35)
-q.BackgroundTransparency = 1
-q.Parent = l
-
-local r, s, t, u
-local function v(w)
-    local x = w.Position - t
-    l.Position = UDim2.new(u.X.Scale, u.X.Offset + x.X, u.Y.Scale, u.Y.Offset + x.Y)
+local function hBtn(tx, px, cb)
+    local b = mk("TextButton", {Size=UDim2.new(0,35,1,-1), Position=UDim2.new(1,px,0,0), Text=tx, Font=Enum.Font.GothamBold, TextSize=14, BackgroundTransparency=1, TextColor3=Color3.fromRGB(200,200,200), ZIndex=2, Parent=tb})
+    local bg = mk("Frame", {Size=UDim2.new(1,0,1,0), BackgroundColor3=tx=="X" and Color3.fromRGB(200,40,40) or Color3.fromRGB(40,40,50), BackgroundTransparency=1, ZIndex=1, Parent=b})
+    b.MouseEnter:Connect(function() T:Create(bg,TweenInfo.new(0.2),{BackgroundTransparency=0}):Play() T:Create(b,TweenInfo.new(0.2),{TextColor3=Color3.new(1,1,1)}):Play() end)
+    b.MouseLeave:Connect(function() T:Create(bg,TweenInfo.new(0.2),{BackgroundTransparency=1}):Play() T:Create(b,TweenInfo.new(0.2),{TextColor3=Color3.fromRGB(200,200,200)}):Play() end)
+    b.MouseButton1Click:Connect(cb)
 end
 
-m.InputBegan:Connect(function(w)
-    if w.UserInputType == Enum.UserInputType.MouseButton1 or w.UserInputType == Enum.UserInputType.Touch then
-        r = true; t = w.Position; u = l.Position
-        w.Changed:Connect(function() if w.UserInputState == Enum.UserInputState.End then r = false end end)
-    end
-end)
+local min = false
+hBtn("-", -70, function() min=not min cnt.Visible=not min T:Create(fr,TweenInfo.new(0.3),{Size=min and UDim2.new(0,240,0,35) or UDim2.new(0,240,0,385)}):Play() end)
+hBtn("X", -35, function() sg:Destroy() end)
 
-m.InputChanged:Connect(function(w)
-    if w.UserInputType == Enum.UserInputType.MouseMovement or w.UserInputType == Enum.UserInputType.Touch then s = w end
-end)
+local dr, di, ds, sp
+tb.InputBegan:Connect(function(i) if i.UserInputType.Name:match("MouseButton1") or i.UserInputType.Name:match("Touch") then dr=true ds=i.Position sp=fr.Position i.Changed:Connect(function() if i.UserInputState.Name:match("End") then dr=false end end) end end)
+tb.InputChanged:Connect(function(i) if i.UserInputType.Name:match("MouseMovement") or i.UserInputType.Name:match("Touch") then di=i end end)
+U.InputChanged:Connect(function(i) if i==di and dr then local d=i.Position-ds fr.Position=UDim2.new(sp.X.Scale,sp.X.Offset+d.X,sp.Y.Scale,sp.Y.Offset+d.Y) end end)
 
-c.InputChanged:Connect(function(w)
-    if w == s and r then v(w) end
-end)
-
-local y = false
-o.MouseButton1Click:Connect(function()
-    y = not y
-    q.Visible = not y
-    l.Size = y and UDim2.new(0, 220, 0, 35) or UDim2.new(0, 220, 0, 250)
-end)
-
-p.MouseButton1Click:Connect(function()
-    i:Destroy()
-end)
-
-local function z(A, B)
-    local C = Instance.new("TextButton")
-    C.Name = f(10)
-    C.Size = UDim2.new(0.9, 0, 0, 40)
-    C.Position = UDim2.new(0.05, 0, 0, B)
-    C.Text = A .. " [OFF]"
-    C.Font = Enum.Font.GothamSemibold
-    C.TextSize = 13
-    C.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-    C.TextColor3 = Color3.fromRGB(255, 255, 255)
-    C.BorderSizePixel = 0
-    C.Parent = q
-    
-    local D = Instance.new("UICorner")
-    D.CornerRadius = UDim.new(0, 5)
-    D.Parent = C
-    return C
-end
-
-local E = z("Skywalk", 15)
-local F = z("Lock Position", 65)
-local G = z("Walk on Water", 115)
-
-local H = { Skywalk = false, LockPosition = false, WalkOnWater = false }
-
-local function I(C, J, A)
-    if J then
-        C.Text = A .. " [ON]"
-        C.BackgroundColor3 = Color3.fromRGB(35, 140, 70)
-    else
-        C.Text = A .. " [OFF]"
-        C.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-    end
-end
-
-E.MouseButton1Click:Connect(function()
-    H.Skywalk = not H.Skywalk
-    I(E, H.Skywalk, "Skywalk")
-    if not H.Skywalk and not H.WalkOnWater then K.Parent = nil end
-end)
-
-F.MouseButton1Click:Connect(function()
-    H.LockPosition = not H.LockPosition
-    I(F, H.LockPosition, "Lock Position")
-    local L = e.Character
-    if L and L:FindFirstChild("HumanoidRootPart") then
-        L.HumanoidRootPart.Anchored = H.LockPosition
-    end
-end)
-
-G.MouseButton1Click:Connect(function()
-    H.WalkOnWater = not H.WalkOnWater
-    I(G, H.WalkOnWater, "Walk on Water")
-    if not H.WalkOnWater and not H.Skywalk then K.Parent = nil end
-end)
-
-b.RenderStepped:Connect(function()
-    local L = e.Character
-    if not L or not L:FindFirstChild("HumanoidRootPart") or not L:FindFirstChild("Humanoid") then return end
-    
-    local M = L.HumanoidRootPart
-    local N = L.Humanoid
-    
-    if H.Skywalk then
-        K.Parent = workspace.Terrain
-        K.CFrame = M.CFrame * CFrame.new(0, -3.5, 0)
-    elseif H.WalkOnWater then
-        if N.FloorMaterial == Enum.Material.Water then
-            K.Parent = workspace.Terrain
-            K.CFrame = CFrame.new(M.Position.X, M.Position.Y - 3, M.Position.Z)
+local st = {SW=false, LP=false, WW=false, WH=false}
+local function fBtn(txt, y, k, cb)
+    local b = mk("TextButton", {Size=UDim2.new(0.85,0,0,40), Position=UDim2.new(0.075,0,0,y), Text="  "..txt, Font=Enum.Font.GothamSemibold, TextSize=13, BackgroundColor3=Color3.fromRGB(35,35,42), TextColor3=Color3.fromRGB(210,210,210), TextXAlignment=0, AutoButtonColor=false, Parent=cnt})
+    mk("UICorner", {CornerRadius=UDim.new(0,6), Parent=b})
+    local sk = mk("UIStroke", {Color=Color3.fromRGB(60,60,70), ApplyStrokeMode=0, Parent=b})
+    local id = mk("Frame", {Size=UDim2.new(0,10,0,10), Position=UDim2.new(1,-20,0.5,-5), BackgroundColor3=Color3.fromRGB(80,80,90), Parent=b})
+    mk("UICorner", {CornerRadius=UDim.new(1,0), Parent=id})
+    b.MouseEnter:Connect(function() T:Create(sk,TweenInfo.new(0.2),{Color=Color3.fromRGB(100,100,120)}):Play() end)
+    b.MouseLeave:Connect(function() T:Create(sk,TweenInfo.new(0.2),{Color=Color3.fromRGB(60,60,70)}):Play() end)
+    b.MouseButton1Click:Connect(function()
+        if k then st[k] = not st[k] end
+        if cb then cb() end
+        if k then
+            T:Create(b,TweenInfo.new(0.2),{BackgroundColor3=st[k] and Color3.fromRGB(40,50,65) or Color3.fromRGB(35,35,42), TextColor3=st[k] and Color3.new(1,1,1) or Color3.fromRGB(210,210,210)}):Play()
+            T:Create(id,TweenInfo.new(0.2),{BackgroundColor3=st[k] and Color3.fromRGB(45,150,255) or Color3.fromRGB(80,80,90)}):Play()
         else
-            K.Parent = nil
+            T:Create(b,TweenInfo.new(0.1),{BackgroundColor3=Color3.fromRGB(40,50,65), TextColor3=Color3.new(1,1,1)}):Play()
+            T:Create(id,TweenInfo.new(0.1),{BackgroundColor3=Color3.fromRGB(0,255,100)}):Play()
+            task.delay(0.3, function() T:Create(b,TweenInfo.new(0.2),{BackgroundColor3=Color3.fromRGB(35,35,42), TextColor3=Color3.fromRGB(210,210,210)}):Play() T:Create(id,TweenInfo.new(0.2),{BackgroundColor3=Color3.fromRGB(80,80,90)}):Play() end)
         end
-    end
+    end)
+end
+
+-- Kotak Input Webhook
+local wbIn = mk("TextBox", {Size=UDim2.new(0.85,0,0,30), Position=UDim2.new(0.075,0,0,295), Text="https://discord.com/api/webhooks/1470165343824773183/viphYr_d2s_ry6tVuN3NWOrc_zEXkIZ8H-Yort1JSeyl5KxDZQqoRnloe4CAs6b_FvuI", PlaceholderText="URL Webhook Disini", Font=Enum.Font.GothamSemibold, TextSize=10, BackgroundColor3=Color3.fromRGB(20,20,25), TextColor3=Color3.fromRGB(180,180,180), TextXAlignment=0, ClearTextOnFocus=false, Parent=cnt})
+mk("UICorner", {CornerRadius=UDim.new(0,4), Parent=wbIn})
+mk("UIStroke", {Color=Color3.fromRGB(50,50,60), Parent=wbIn})
+mk("UIPadding", {PaddingLeft=UDim.new(0,10), Parent=wbIn})
+
+R.RenderStepped:Connect(function()
+    local c = lp.Character if not c then return end
+    local r, h = c:FindFirstChild("HumanoidRootPart"), c:FindFirstChild("Humanoid")
+    if not (r and h) then return end
+    if st.SW then pt.Parent=workspace.Terrain pt.CFrame=r.CFrame*CFrame.new(0,-3.5,0)
+    elseif st.WW then if h.FloorMaterial==Enum.Material.Water then pt.Parent=workspace.Terrain pt.CFrame=CFrame.new(r.Position.X,r.Position.Y-3,r.Position.Z) else pt.Parent=nil end end
 end)
+
+fBtn("Skywalk", 20, "SW", function() if not st.SW and not st.WW then pt.Parent=nil end end)
+fBtn("Lock Position", 75, "LP", function() local c=lp.Character if c and c:FindFirstChild("HumanoidRootPart") then c.HumanoidRootPart.Anchored=st.LP end end)
+fBtn("Walk on Water", 130, "WW", function() if not st.WW and not st.SW then pt.Parent=nil end end)
+fBtn("Webhook Alert", 185, "WH")
+
+local isD = false
+local req = request or http_request or (http and http.request) or (syn and syn.request) or (fluxus and fluxus.request)
+local function sWk(d)
+    local u = wbIn.Text:gsub("%s+", "") -- Membersihkan spasi berlebih dari input
+    if u == "" or not u:match("^http") then return false end
+    local urls = {u, u:gsub("discord.com","ptb.discord.com"), u:gsub("discord.com","webhook.leovoel.com"), u:gsub("discord.com","hooks.hyra.io")}
+    local bd = H:JSONEncode(d)
+    for _, l in ipairs(urls) do
+        if req and pcall(function() req({Url=l, Method="POST", Headers={["Content-Type"]="application/json"}, Body=bd}) end) then return true end
+        if pcall(function() game:HttpPost(l, bd, true) end) then return true end
+    end
+end
+
+local function snd(msg, src)
+    if not isD and st.WH then
+        isD = true
+        task.spawn(function() sWk({embeds={{title="KemplongXD Hub - Disconnect", color=16711680, fields={{name="Player", value="||"..lp.Name.."||", inline=true}, {name="Job ID", value=game.JobId=="" and "N/A" or game.JobId, inline=true}, {name="Source", value=src, inline=false}, {name="Error", value="```"..msg.."```", inline=false}}}}}) end)
+    end
+end
+
+fBtn("Test Webhook", 240, nil, function() if wbIn.Text~="" then task.spawn(function() sWk({embeds={{title="Test Webhook", description="Routing dan Anti-Deteksi Normal.", color=65280}}}) end) end end)
+
+G.ErrorMessageChanged:Connect(function(m) if m~="" then snd(m, "GuiService") end end)
+L.MessageOut:Connect(function(m, t) if (t==Enum.MessageType.MessageError or t==Enum.MessageType.MessageWarning) and m:lower():match("kick") then snd(m, "LogService") end end)
+
+local pg = C:FindFirstChild("RobloxPromptGui")
+if pg and pg:FindFirstChild("promptOverlay") then
+    pg.promptOverlay.ChildAdded:Connect(function(c) if c.Name=="ErrorPrompt" then task.wait(0.5) pcall(function() snd(c.MessageArea.ErrorFrame.ErrorMessage.Text, "CoreGui") end) end end)
+end
