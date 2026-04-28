@@ -1,0 +1,256 @@
+local CG, RS, Plrs, VU, TS = game:GetService("CoreGui"), game:GetService("ReplicatedStorage"), game:GetService("Players"), game:GetService("VirtualUser"), game:GetService("TweenService")
+local UIS, HS, LP = game:GetService("UserInputService"), game:GetService("HttpService"), Plrs.LocalPlayer
+local GP;
+
+pcall(function() GP = gethui and gethui() end); if not GP then pcall(function() GP = CG; local _ = CG.Name end) end;
+GP = GP or LP:WaitForChild("PlayerGui")
+local HN = "KXD_MacHub"; if GP:FindFirstChild(HN) then GP[HN]:Destroy() end
+
+local C = {BG=Color3.fromRGB(30,30,30), SB=Color3.fromRGB(37,37,40), TB=Color3.fromRGB(30,30,30), Ac=Color3.fromRGB(10,132,255), Tx=Color3.fromRGB(255,255,255), TD=Color3.fromRGB(152,152,157), El=Color3.fromRGB(50,50,53), On=Color3.fromRGB(50,215,75), Off=Color3.fromRGB(57,57,61), Sp=Color3.fromRGB(65,65,65)}
+local function Mk(c, p) local i = Instance.new(c);
+for k, v in pairs(p) do i[k] = v end;
+return i end
+
+local SG = Mk("ScreenGui", {Name=HN, Parent=GP, ResetOnSpawn=false})
+
+local UI = {Tbs={}, S={}};
+UI.__index = UI
+function UI.new()
+    local s = setmetatable({}, UI);
+    s.SG = SG
+    s.MF = Mk("Frame", {Size=UDim2.new(0,600,0,380), Position=UDim2.new(0.5,-300,0.5,-190), BackgroundColor3=C.BG, Active=true, Draggable=true, ClipsDescendants=true, Parent=s.SG})
+    Mk("UICorner", {CornerRadius=UDim.new(0,12), Parent=s.MF});
+    Mk("UIStroke", {Color=Color3.fromRGB(60,60,60), Thickness=1, Parent=s.MF})
+    s.TB = Mk("Frame", {Size=UDim2.new(1,0,0,40), BackgroundColor3=C.TB, BorderSizePixel=0, Parent=s.MF})
+    Mk("TextLabel", {Size=UDim2.new(1,0,1,0), Position=UDim2.new(0,0,0,0), BackgroundTransparency=1, Text="KemplongXD Hub (Safe Mode)", TextColor3=C.Tx, Font=Enum.Font.GothamBold, TextSize=13, Parent=s.TB})
+    
+    local cR = Mk("TextButton", {Size=UDim2.new(0,12,0,12), Position=UDim2.new(0,15,0,14), BackgroundColor3=Color3.fromRGB(255,95,86), Text="", Parent=s.TB});
+    Mk("UICorner", {CornerRadius=UDim.new(1,0), Parent=cR})
+    local cY = Mk("TextButton", {Size=UDim2.new(0,12,0,12), Position=UDim2.new(0,35,0,14), BackgroundColor3=Color3.fromRGB(255,189,46), Text="", Parent=s.TB});
+    Mk("UICorner", {CornerRadius=UDim.new(1,0), Parent=cY})
+    local cG = Mk("TextButton", {Size=UDim2.new(0,12,0,12), Position=UDim2.new(0,55,0,14), BackgroundColor3=Color3.fromRGB(39,201,63), Text="", Parent=s.TB});
+    Mk("UICorner", {CornerRadius=UDim.new(1,0), Parent=cG})
+    
+    s.SB = Mk("Frame", {Size=UDim2.new(0,150,1,-40), Position=UDim2.new(0,0,0,40), BackgroundColor3=C.SB, BorderSizePixel=0, Parent=s.MF})
+    Mk("UIListLayout", {SortOrder=Enum.SortOrder.LayoutOrder, Padding=UDim.new(0,6), HorizontalAlignment=Enum.HorizontalAlignment.Center, Parent=s.SB});
+    Mk("UIPadding", {PaddingTop=UDim.new(0,10), Parent=s.SB})
+    s.PC = Mk("Frame", {Size=UDim2.new(1,-150,1,-40), Position=UDim2.new(0,150,0,40), BackgroundTransparency=1, Parent=s.MF})
+    s.NC = Mk("Frame", {Size=UDim2.new(0,260,1,-20), Position=UDim2.new(1,-270,0,10), BackgroundTransparency=1, Parent=s.SG});
+    Mk("UIListLayout", {SortOrder=Enum.SortOrder.LayoutOrder, Padding=UDim.new(0,10), VerticalAlignment=Enum.VerticalAlignment.Bottom, Parent=s.NC})
+    
+    s.IM = false;
+    cR.MouseButton1Click:Connect(function() s.SG:Destroy() end)
+    cY.MouseButton1Click:Connect(function() s.IM = not s.IM; TS:Create(s.MF, TweenInfo.new(0.4, Enum.EasingStyle.Quint), {Size=s.IM and UDim2.new(0,600,0,40) or UDim2.new(0,600,0,380)}):Play(); if not s.IM then task.wait(0.1) end; s.SB.Visible = not s.IM; s.PC.Visible = not s.IM end)
+    return s
+end
+
+function UI:Notif(t, d, tm) pcall(function() local f = Mk("Frame", {Size=UDim2.new(1,0,0,60), BackgroundColor3=C.El, BackgroundTransparency=0.1, Parent=self.NC}); Mk("UICorner", {CornerRadius=UDim.new(0,10), Parent=f}); Mk("UIStroke", {Color=C.Sp, Thickness=1, Parent=f}); Mk("TextLabel", {Size=UDim2.new(1,-20,0,20), Position=UDim2.new(0,10,0,8), BackgroundTransparency=1, Text=t, TextColor3=C.Tx, TextXAlignment=0, Font=Enum.Font.GothamBold, TextSize=13, Parent=f}); Mk("TextLabel", {Size=UDim2.new(1,-20,0,25), Position=UDim2.new(0,10,0,28), BackgroundTransparency=1, Text=tostring(d), TextColor3=C.TD, TextXAlignment=0, TextYAlignment=0, Font=Enum.Font.Gotham, TextSize=11, TextWrapped=true, Parent=f});
+f.Position = UDim2.new(1,20,0,0); TS:Create(f, TweenInfo.new(0.4, Enum.EasingStyle.Quint), {Position=UDim2.new(0,0,0,0)}):Play(); task.delay(tm or 3, function() TS:Create(f, TweenInfo.new(0.4, Enum.EasingStyle.Quint), {Position=UDim2.new(1,20,0,0), BackgroundTransparency=1}):Play(); task.wait(0.4); f:Destroy() end) end) end
+function UI:AddTab(n) local f = (#self.Tbs == 0);
+local b = Mk("TextButton", {Size=UDim2.new(1,-16,0,34), BackgroundColor3=f and C.Ac or C.SB, Text="   "..n, TextColor3=f and C.Tx or C.TD, TextXAlignment=0, Font=Enum.Font.GothamSemibold, TextSize=13, BorderSizePixel=0, Parent=self.SB});
+Mk("UICorner", {CornerRadius=UDim.new(0,6), Parent=b}); local p = Mk("ScrollingFrame", {Size=UDim2.new(1,0,1,0), BackgroundTransparency=1, BorderSizePixel=0, ScrollBarThickness=3, Visible=f, Parent=self.PC}); Mk("UIListLayout", {SortOrder=Enum.SortOrder.LayoutOrder, Padding=UDim.new(0,12), HorizontalAlignment=Enum.HorizontalAlignment.Center, Parent=p});
+Mk("UIPadding", {PaddingTop=UDim.new(0,15), PaddingBottom=UDim.new(0,15), Parent=p}); table.insert(self.Tbs, {B=b, P=p, N=n}); b.MouseButton1Click:Connect(function() for _, t in ipairs(self.Tbs) do local sl = (t.N == n); t.P.Visible = sl; TS:Create(t.B, TweenInfo.new(0.2), {BackgroundColor3=sl and C.Ac or C.SB}):Play(); t.B.TextColor3 = sl and C.Tx or C.TD end end);
+return p end
+function UI:AddLbl(p,t,h) local c=Mk("Frame",{Size=UDim2.new(1,-30,0,h or 80),BackgroundColor3=C.El,Parent=p}); Mk("UICorner",{CornerRadius=UDim.new(0,8),Parent=c}); Mk("UIStroke",{Color=C.Sp,Thickness=1,Parent=c}); Mk("TextLabel",{Size=UDim2.new(1,-20,1,-10),Position=UDim2.new(0,10,0,5),BackgroundTransparency=1,Text=t,TextColor3=C.TD,TextXAlignment=0,TextYAlignment=Enum.TextYAlignment.Top,Font=Enum.Font.GothamSemibold,TextSize=12,TextWrapped=true,Parent=c}); return c end
+function UI:AddTgl(p,t,cb) local c=Mk("Frame",{Size=UDim2.new(1,-30,0,44),BackgroundColor3=C.El,Parent=p}); Mk("UICorner",{CornerRadius=UDim.new(0,8),Parent=c}); Mk("UIStroke",{Color=C.Sp,Thickness=1,Parent=c}); Mk("TextLabel",{Size=UDim2.new(1,-70,1,0),Position=UDim2.new(0,15,0,0),BackgroundTransparency=1,Text=t,TextColor3=C.Tx,TextXAlignment=0,Font=Enum.Font.GothamSemibold,TextSize=13,Parent=c}); local sb=Mk("Frame",{Size=UDim2.new(0,38,0,20),Position=UDim2.new(1,-50,0.5,-10),BackgroundColor3=C.Off,Parent=c});
+Mk("UICorner",{CornerRadius=UDim.new(1,0),Parent=sb}); local k=Mk("Frame",{Size=UDim2.new(0,16,0,16),Position=UDim2.new(0,2,0.5,-8),BackgroundColor3=Color3.new(1,1,1),Parent=sb}); Mk("UICorner",{CornerRadius=UDim.new(1,0),Parent=k}); local b=Mk("TextButton",{Size=UDim2.new(1,0,1,0),BackgroundTransparency=1,Text="",Parent=c}); local o=false; local function set(s) o=s; TS:Create(k,TweenInfo.new(0.2),{Position=o and UDim2.new(1,-18,0.5,-8) or UDim2.new(0,2,0.5,-8)}):Play();
+TS:Create(sb,TweenInfo.new(0.2),{BackgroundColor3=o and C.On or C.Off}):Play(); cb(o) end; b.MouseButton1Click:Connect(function() set(not o) end); return set end
+function UI:AddBtn(p,t,cb) local b=Mk("TextButton",{Size=UDim2.new(1,-30,0,40),BackgroundColor3=C.El,Text=t,TextColor3=C.Tx,Font=Enum.Font.GothamBold,TextSize=13,Parent=p}); Mk("UICorner",{CornerRadius=UDim.new(0,8),Parent=b}); Mk("UIStroke",{Color=C.Sp,Thickness=1,Parent=b});
+b.MouseButton1Click:Connect(function() TS:Create(b,TweenInfo.new(0.1),{BackgroundColor3=Color3.fromRGB(60,60,65)}):Play(); task.wait(0.1); TS:Create(b,TweenInfo.new(0.1),{BackgroundColor3=C.El}):Play(); if cb then cb() end end); return b end
+function UI:AddInp(p,pl,d) local i=Mk("TextBox",{Size=UDim2.new(1,-30,0,38),BackgroundColor3=C.BG,Text=d,PlaceholderText=pl,TextColor3=C.Tx,Font=Enum.Font.Gotham,TextSize=13,Parent=p}); Mk("UICorner",{CornerRadius=UDim.new(0,8),Parent=i}); Mk("UIStroke",{Color=C.Sp,Thickness=1,Parent=i});
+return i end
+function UI:AddSep(p) Mk("Frame",{Size=UDim2.new(1,-50,0,1),BackgroundColor3=C.Sp,BorderSizePixel=0,Parent=p}) end
+function UI:AddDrop(p,t,op,cb) local c=Mk("Frame",{Size=UDim2.new(1,-30,0,44),BackgroundColor3=C.El,Parent=p,ClipsDescendants=true}); Mk("UICorner",{CornerRadius=UDim.new(0,8),Parent=c}); Mk("UIStroke",{Color=C.Sp,Thickness=1,Parent=c}); local mb=Mk("TextButton",{Size=UDim2.new(1,-10,0,44),Position=UDim2.new(0,15,0,0),BackgroundTransparency=1,Text=t.." : [ Select ]",TextColor3=C.Tx,TextXAlignment=0,Font=12,TextSize=13,Parent=c}); local ic=Mk("TextLabel",{Size=UDim2.new(0,20,0,44),Position=UDim2.new(1,-30,0,0),BackgroundTransparency=1,Text="▼",TextColor3=C.TD,Font=13,TextSize=12,Parent=c});
+local sf=Mk("ScrollingFrame",{Size=UDim2.new(1,0,0,150),Position=UDim2.new(0,0,0,44),BackgroundTransparency=1,BorderSizePixel=0,ScrollBarThickness=3,Parent=c}); Mk("UIListLayout",{Parent=sf}); local opn=false; mb.MouseButton1Click:Connect(function() opn=not opn; ic.Text=opn and "▲" or "▼"; TS:Create(c,TweenInfo.new(0.25,Enum.EasingStyle.Quint),{Size=opn and UDim2.new(1,-30,0,194) or UDim2.new(1,-30,0,44)}):Play() end);
+local obj={}; function obj:Refresh(nOp) for _,v in ipairs(sf:GetChildren()) do if v:IsA("TextButton") then v:Destroy() end end; sf.CanvasSize=UDim2.new(0,0,0,#nOp*30);
+for _,o in ipairs(nOp) do local ob=Mk("TextButton",{Size=UDim2.new(1,-10,0,30),Position=UDim2.new(0,5,0,0),BackgroundColor3=C.El,BackgroundTransparency=1,Text="  "..o,TextColor3=C.TD,TextXAlignment=0,Font=11,TextSize=12,Parent=sf}); Mk("UICorner",{CornerRadius=UDim.new(0,4),Parent=ob});
+ob.MouseButton1Click:Connect(function() mb.Text=t.." : "..o; opn=false; ic.Text="▼"; TS:Create(c,TweenInfo.new(0.2),{Size=UDim2.new(1,-30,0,44)}):Play(); cb(o) end) end end; obj:Refresh(op);
+return obj end
+function UI:LogStr(n) if type(n)~="table" then return tostring(n) end; local s,f="{",true;
+for k,v in pairs(n) do if not f then s=s..", " end; s=s..tostring(k)..": "..self:LogStr(v); f=false end;
+return s.."}" end
+
+local Net = {CR=nil, SM=nil, CF=nil, ET=nil, SI=nil, CnF=nil, PW=nil, CN=nil, ONFN=nil, RC=nil, EI=nil, LV=nil}
+function Net:Init(u) task.spawn(function() local pk=RS:WaitForChild("Packages",10); if pk then pcall(function() local n=pk._Index["sleitnick_net@0.2.0"].net; self.CR=n:FindFirstChild("RF/ChargeFishingRod"); self.SM=n:FindFirstChild("RF/RequestFishingMinigameStarted"); self.CF=n:FindFirstChild("RE/FishingCompleted"); self.ET=n:FindFirstChild("RE/EquipToolFromHotbar"); self.SI=n:FindFirstChild("RF/SellAllItems"); self.CnF=n:FindFirstChild("RF/CancelFishingInputs"); self.PW=n:FindFirstChild("RF/PurchaseWeatherEvent"); self.CN=n:FindFirstChild("RE/ClaimNotification"); self.ONFN=n:FindFirstChild("RE/ObtainedNewFishNotification"); self.RC=n:FindFirstChild("RE/ReplicateCutscene"); self.LV=n:FindFirstChild("RF/LoadVFX"); if self.CF then self.CF.OnClientEvent:Connect(function(...) u:Notif("Fisherman", u:LogStr({...}), 4) end) end; u:Notif("System", "Sistem Jaringan Terkoneksi.", 3) end) else u:Notif("Error", "Jaringan gagal dimuat.", 5) end end) end
+
+getgenv().KXDM_UI = UI
+getgenv().KXDM_Net = Net
+getgenv().KXDM_Util = {LP=LP, VU=VU, UIS=UIS, HS=HS, Plrs=Plrs, C=C, Mk=Mk, SG=SG, TS=TS}
+local UI, Net, Util = getgenv().KXDM_UI, getgenv().KXDM_Net, getgenv().KXDM_Util
+if not UI then warn("Jalankan Bagian 1 Dulu!") return end
+local LP, VU, UIS, HS, Plrs, C, Mk, SG, TS = Util.LP, Util.VU, Util.UIS, Util.HS, Util.Plrs, Util.C, Util.Mk, Util.SG, Util.TS
+
+local function getTargetPos()
+    local c = LP.Character
+    if c and c:FindFirstChild("HumanoidRootPart") then
+        local p = c.HumanoidRootPart.Position + (c.HumanoidRootPart.CFrame.LookVector * 15)
+        return p.X, p.Y, p.Z
+    end
+    return 0, 0, 0
+end
+
+local hub = UI.new()
+local pInf = hub:AddTab("Info")
+local pFsh = hub:AddTab("Fishing")
+local pSl = hub:AddTab("Auto Sell")
+local pWth = hub:AddTab("Weather")
+local pPlr = hub:AddTab("Player")
+local pTp = hub:AddTab("Teleport")
+local pMsc = hub:AddTab("Misc")
+Net:Init(hub)
+
+local infoIntro = "🎣 KemplongXD Hub (Safe Mode)\n\nSelamat datang! KemplongXD Hub adalah script utilitas tingkat lanjut yang dirancang khusus untuk automasi memancing dan fitur penunjang lainnya. Versi ini berfokus pada keamanan ekstra (Stealth) dan kecepatan."
+local infoFitur = "✨ FITUR UTAMA\n• Fishing: Legit (Natural Farming) & Amblatant Beta (Fast Async Sync).\n• Economy: Auto Sell All Items & Auto Buy All Weather (Storm, Wind, Cloudy).\n• Player: Modifikasi WalkSpeed, JumpPower, Fly (Support Mobile/PC), & Local Name Changer.\n• World: Teleport Instan ke berbagai pulau & Player ESP Teleport.\n• Misc: Disable Cutscene, Anti-AFK, & Auto Clear Notifikasi."
+local infoKelebihan = "🛡️ KELEBIHAN (ADVANTAGES)\n• Anti-Cheat Bypass: Aman dari Namecall Detection (Tanpa Hook Metatable).\n• Smart Synchronization: Amblatant Beta mengeksekusi secara asinkron tanpa memblokir ping, sehingga sangat cepat namun urutannya diakui aman oleh server.\n• Lightweight: UI sangat ringan, bersih, dan tidak menyebabkan FPS drop saat farming."
+
+hub:AddLbl(pInf, infoIntro, 90)
+hub:AddLbl(pInf, infoFitur, 120)
+hub:AddLbl(pInf, infoKelebihan, 100)
+
+local tLg, tAm, tAmBeta
+
+tLg = hub:AddTgl(pFsh, "Legit Fishing", function(s) 
+    hub.S.Lg = s;
+    if s then 
+        if hub.S.Am then tAm(false) end; 
+        if hub.S.AmBeta then tAmBeta(false) end;
+        hub:Notif("Fishing", "Legit Aktif (Always Perfect)", 2);
+        task.spawn(function() 
+            while hub.S.Lg do 
+                local t = tick(); 
+                local tx, ty, tz = getTargetPos()
+                pcall(function() if Net.CR then Net.CR:InvokeServer(tx, ty, tz, t) end end); 
+                task.wait(0.5); 
+                if not hub.S.Lg then break end; 
+                pcall(function() if Net.SM then Net.SM:InvokeServer(tx, ty, t) end end); 
+                task.wait(0.5); 
+                if not hub.S.Lg then break end; 
+                pcall(function() if Net.CF then Net.CF:FireServer() end end); 
+                task.wait(1) 
+            end 
+        end) 
+    else 
+        pcall(function() if Net.CnF then Net.CnF:InvokeServer() end end) 
+    end 
+end)
+
+hub:AddSep(pFsh)
+local iAD = hub:AddInp(pFsh, "Delay Cast (s)", "1")
+local iAC = hub:AddInp(pFsh, "Delay Cancel (s)", "0.5")
+
+tAm = hub:AddTgl(pFsh, "AMBLATANT (Normal)", function(s) 
+    hub.S.Am = s; 
+    if s then 
+        if hub.S.Lg then tLg(false) end; 
+        if hub.S.AmBeta then tAmBeta(false) end;
+        hub:Notif("Fishing", "AMBLATANT Aktif (Always Perfect)", 2); 
+        task.spawn(function() 
+            while hub.S.Am do 
+                local cD, cnD = tonumber(iAD.Text) or 1, tonumber(iAC.Text) or 0.5; 
+                task.spawn(function() 
+                    local t = tick() + math.random(-10,10)/1000; 
+                    local tx, ty, tz = getTargetPos()
+                    pcall(function() if Net.CR then Net.CR:InvokeServer(tx, ty, tz, t) end end);
+                    pcall(function() if Net.SM then Net.SM:InvokeServer(tx, ty, t) end end); 
+                    pcall(function() if Net.CF then Net.CF:FireServer() end end); 
+                    task.wait(cnD);
+                    pcall(function() if Net.CnF then Net.CnF:InvokeServer() end end) 
+                end); 
+                task.wait(cD) 
+            end 
+        end) 
+    else 
+        pcall(function() if Net.CnF then Net.CnF:InvokeServer() end end) 
+    end 
+end)
+
+-- UPDATE: BLAZING FAST ASYNC SEQUENCE (AMBLATANT BETA)
+tAmBeta = hub:AddTgl(pFsh, "AMBLATANT BETA (Fast Sync)", function(s)
+    hub.S.AmBeta = s
+    if s then
+        if hub.S.Lg then tLg(false) end
+        if hub.S.Am then tAm(false) end
+        hub:Notif("Fishing", "BETA (Fast Sync) Aktif!", 2)
+        task.spawn(function()
+            while hub.S.AmBeta do
+                local tx, ty, tz = getTargetPos()
+                local cTick = tick()
+                
+                if Net.CR and Net.SM and Net.CF then
+                    -- 1. Eksekusi CR tanpa memblokir thread (Async)
+                    task.spawn(function() pcall(function() Net.CR:InvokeServer(tx, ty, tz, cTick) end) end)
+                    
+                    -- 2. Jeda super singkat 50ms sekadar menjaga urutan log di server
+                    task.wait(0.05)
+                    
+                    -- 3. Eksekusi SM secara asinkron
+                    task.spawn(function() pcall(function() Net.SM:InvokeServer(tx, ty, cTick) end) end)
+                    
+                    -- 4. Jeda penyelesaian agar terlihat seperti delay reaksi manusia minimalis
+                    task.wait(0.1)
+                    
+                    -- 5. Selesaikan minigame
+                    pcall(function() Net.CF:FireServer() end)
+                end
+                
+                -- Cooldown siklus baru tanpa bergantung pada ping koneksi
+                task.wait(0.05)
+            end
+        end)
+    else
+        pcall(function() if Net.CnF then Net.CnF:InvokeServer() end end)
+    end
+end)
+
+hub:AddSep(pFsh)
+hub:AddTgl(pFsh, "Auto Equip (Slot 1)", function(s) hub.S.AE = s; task.spawn(function() while hub.S.AE do pcall(function() if Net.ET then Net.ET:FireServer(1) end end); task.wait(3) end end) end)
+hub:AddBtn(pFsh, "Force Cancel Fishing", function() pcall(function() if Net.CnF then Net.CnF:InvokeServer() end end) end)
+
+local iSD = hub:AddInp(pSl, "Delay Sell (s)", "15")
+hub:AddTgl(pSl, "Auto Sell All", function(s) hub.S.AS = s; task.spawn(function() while hub.S.AS do task.spawn(function() local x,r = pcall(function() return Net.SI and Net.SI:InvokeServer() end); if x and r then hub:Notif("Market", "Terjual: "..hub:LogStr(r), 3) end end); task.wait(math.clamp(tonumber(iSD.Text) or 15, 1, 3600)) end end) end)
+hub:AddBtn(pSl, "Sell All Now", function() task.spawn(function() local x,r = pcall(function() return Net.SI and Net.SI:InvokeServer() end); if x and r then hub:Notif("Market", "Terjual: "..hub:LogStr(r), 3) end end) end)
+
+hub:AddTgl(pWth, "Maintain All Weather", function(s) hub.S.AW = s; task.spawn(function() while hub.S.AW do task.spawn(function() pcall(function() if Net.PW then Net.PW:InvokeServer("Cloudy"); Net.PW:InvokeServer("Storm"); Net.PW:InvokeServer("Wind") end end) end); hub:Notif("Weather", "Cuaca dipertahankan.", 2); task.wait(300) end end) end)
+hub:AddBtn(pWth, "Buy All Weather Now", function() pcall(function() if Net.PW then Net.PW:InvokeServer("Cloudy"); Net.PW:InvokeServer("Storm"); Net.PW:InvokeServer("Wind") end end); hub:Notif("Weather", "Semua cuaca dibeli.", 2) end)
+
+local iWS = hub:AddInp(pPlr, "WalkSpeed", "50")
+hub:AddTgl(pPlr, "Enable WalkSpeed", function(s) hub.S.WS = s; task.spawn(function() while hub.S.WS do pcall(function() LP.Character.Humanoid.WalkSpeed = tonumber(iWS.Text) or 16 end); task.wait(0.1) end; pcall(function() LP.Character.Humanoid.WalkSpeed = 16 end) end) end)
+local iJP = hub:AddInp(pPlr, "JumpPower", "100")
+hub:AddTgl(pPlr, "Enable JumpPower", function(s) hub.S.JP = s; task.spawn(function() while hub.S.JP do pcall(function() LP.Character.Humanoid.UseJumpPower=true; LP.Character.Humanoid.JumpPower=tonumber(iJP.Text) or 50 end); task.wait(0.1) end; pcall(function() LP.Character.Humanoid.JumpPower=50 end) end) end)
+local iFS = hub:AddInp(pPlr, "Fly Speed", "50"); local fv, fg
+hub:AddTgl(pPlr, "Enable Fly (Mob/PC)", function(s) hub.S.Fly = s; local c = LP.Character; local h = c and c:FindFirstChild("HumanoidRootPart"); if not h then return end; if s then fv=Instance.new("BodyVelocity",h); fv.MaxForce=Vector3.new(9e9,9e9,9e9); fg=Instance.new("BodyGyro",h); fg.MaxTorque=Vector3.new(9e9,9e9,9e9); fg.P=10000; pcall(function() c.Humanoid.PlatformStand=true end); task.spawn(function() local PM=LP:WaitForChild("PlayerScripts"):WaitForChild("PlayerModule"); local C=require(PM):GetControls(); while hub.S.Fly and fv and fv.Parent do local cm=workspace.CurrentCamera; local m=C:GetMoveVector(); local d=(cm.CFrame.LookVector * -m.Z)+(cm.CFrame.RightVector * m.X); if UIS:IsKeyDown(Enum.KeyCode.Space) then d=d+Vector3.new(0,1,0) end; if UIS:IsKeyDown(Enum.KeyCode.LeftShift) then d=d-Vector3.new(0,1,0) end; fv.Velocity=d*(tonumber(iFS.Text) or 50); fg.CFrame=cm.CFrame; task.wait() end; if fv then fv:Destroy() end; if fg then fg:Destroy() end; pcall(function() LP.Character.Humanoid.PlatformStand=false end) end) else if fv then fv:Destroy() end; if fg then fg:Destroy() end; pcall(function() LP.Character.Humanoid.PlatformStand=false end) end end)
+local iNm = hub:AddInp(pPlr, "New Name (Local)", "Guest")
+hub:AddBtn(pPlr, "Change Name", function() local nN = iNm.Text; local c = LP.Character; if c then pcall(function() c.Humanoid.DisplayName = nN end); for _,v in pairs(c:GetDescendants()) do if (v:IsA("TextLabel") or v:IsA("TextButton")) and v:FindFirstAncestorOfClass("BillboardGui") then pcall(function() v.Text = nN end) end end end; hub:Notif("System", "Nama diubah ke "..nN, 2) end)
+
+local Tp = {
+    ["Farm Enchant Stone"] = Vector3.new(-8795.22, -585.00, 91.66),
+    ["Fisherman Island"] = Vector3.new(41.07, 9.66, 2806.15),
+    ["Kohana"] = Vector3.new(-651.91, 16.04, 603.68),
+    ["Kohana Volcano"] = Vector3.new(-562.00, 21.29, 156.00),
+    ["Coral Reef"] = Vector3.new(-3272.00, 2.50, 2232.00),
+    ["Esoteric Depths"] = Vector3.new(3232.00, -1302.85, 1401.00),
+    ["Tropical Grove"] = Vector3.new(-2034.16, 6.27, 3715.66),
+    ["Crater Island"] = Vector3.new(1052.00, 2.21, 5022.02),
+    ["Sisyphus Statue"] = Vector3.new(-3701.88, -135.57, -1016.46),
+    ["Treasure Room"] = Vector3.new(-3603.00, -266.57, -1578.01),
+    ["Ancient Jungle"] = Vector3.new(1494.11, 7.41, -436.36),
+    ["Sacred Temple"] = Vector3.new(1481.89, -21.85, -632.26),
+    ["Ancient Ruin"] = Vector3.new(6089.02, -585.92, 4635.00),
+    ["Underground Cellar"] = Vector3.new(2134.00, -91.20, -692.01),
+    ["Christmas Island"] = Vector3.new(686.37, 5.08, 1562.82)
+}
+local lN={}; for n in pairs(Tp) do table.insert(lN, n) end; table.sort(lN); local sT=nil
+hub:AddDrop(pTp, "Pilih Lokasi", lN, function(s) sT = s end)
+hub:AddBtn(pTp, "Teleport ke Lokasi", function() if sT and Tp[sT] then pcall(function() LP.Character.HumanoidRootPart.CFrame = CFrame.new(Tp[sT]) end); hub:Notif("Teleport", "Menuju: "..sT, 2) end end)
+
+hub:AddSep(pTp)
+local function getPlrs() local l={}; for _,v in ipairs(Plrs:GetPlayers()) do if v~=LP then table.insert(l,v.Name) end end; table.sort(l); return l end
+local sPlr = nil
+local dropPlr = hub:AddDrop(pTp, "Pilih Player", getPlrs(), function(s) sPlr = s end)
+hub:AddBtn(pTp, "Refresh List Player", function() dropPlr:Refresh(getPlrs()); hub:Notif("Teleport", "Daftar Player Diperbarui", 2) end)
+hub:AddBtn(pTp, "Teleport ke Player", function() if sPlr then local p=Plrs:FindFirstChild(sPlr); if p and p.Character and p.Character:FindFirstChild("HumanoidRootPart") and LP.Character and LP.Character:FindFirstChild("HumanoidRootPart") then LP.Character.HumanoidRootPart.CFrame = p.Character.HumanoidRootPart.CFrame * CFrame.new(0,0,3); hub:Notif("Teleport", "Berhasil teleport ke "..sPlr, 2) else hub:Notif("Error", "Player/Karakter tidak ditemukan", 3) end else hub:Notif("Error", "Pilih player terlebih dahulu!", 3) end end)
+
+hub:AddTgl(pMsc, "Disable Cutscene", function(s) hub.S.DC=s; if Net.RC and getconnections then for _, c in ipairs(getconnections(Net.RC.OnClientEvent)) do if s then c:Disable() else c:Enable() end end; hub:Notif("System", "Cutscene "..(s and "Mati" or "Nyala"), 2) else hub:Notif("Error", "getconnections tak didukung", 3) end end)
+hub:AddTgl(pMsc, "Auto Clear Notif", function(s) hub.S.ACN = s; task.spawn(function() while hub.S.ACN do pcall(function() if Net.CN then Net.CN:FireServer("Fish") end end); task.wait(5) end end) end)
+hub:AddBtn(pMsc, "Clear Notif Now", function() pcall(function() if Net.CN then Net.CN:FireServer("Fish") end end) end)
+hub:AddTgl(pMsc, "Anti-AFK", function(s) hub.S.AFK = s end); LP.Idled:Connect(function() if hub.S.AFK then VU:CaptureController(); VU:ClickButton2(Vector2.new()) end end)
